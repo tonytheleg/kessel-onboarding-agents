@@ -1,0 +1,57 @@
+# .pre-commit-config.yaml — local pre-commit hooks for kessel-onboarding-agents.
+#
+# Shifts the same checks run in CI (.gitlab-ci.yml) left to the developer's
+# machine, so failures surface before a push rather than after CI picks them up.
+#
+# Setup (one-time):
+#   pip install pre-commit          # or: brew install pre-commit
+#   pre-commit install              # installs the git hook
+#   pre-commit install --hook-type pre-push   # also install pre-push hooks
+#
+# Run manually against all files:
+#   pre-commit run --all-files
+#
+# Skip a hook for one commit (use sparingly; CI still enforces):
+#   SKIP=gitleaks git commit -m "..."
+
+repos:
+
+  # ── Secret detection (staged files only — fast) ──────────────────────────────
+  # Mirrors: security:secrets CI job
+  # Uses gitleaks protect --staged so only staged changes are scanned.
+  # Configured by .gitleaks.toml at the repo root.
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+        args: ["--config", ".gitleaks.toml"]
+
+  # ── Local repo checks (whole working tree) ───────────────────────────────────
+  # These run on pre-push (not pre-commit) to avoid scanning the full tree on
+  # every commit while still catching issues before they reach the remote.
+  - repo: local
+    hooks:
+
+      # Mirrors: security:pii CI job
+      - id: check-pii
+        name: PII and sensitive content scan
+        entry: sh scripts/check-pii.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+      # Mirrors: verify:skill-metadata CI job
+      - id: check-skill-metadata
+        name: Skill file metadata check
+        entry: sh scripts/check-skill-metadata.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+      # Mirrors: verify:structure CI job
+      - id: verify-structure
+        name: Repository structure check
+        entry: sh scripts/verify-structure.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

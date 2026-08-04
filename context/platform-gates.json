@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "description": "Pattern ID to Platform Readiness status. Only `status` is consumed by any skill (onboarding-interview-suggest-patterns, for confidence cap / paired-path default on wave 3+ services). `jira_key` is no longer consumed by any skill \u2014 the Jira gate-linking skill (onboarding-link-platform-gates) was removed 2026-07 because it never had a populated key to link against; jira_key is kept for the Kessel PM's own record-keeping only. PM updates `status` as platform readiness changes.",
+  "status_reviewed_at": "2026-07-10",
+  "status_reviewed_note": "All gates set to 'ready' per EM/PM confirmation that Kessel core + Access APIs, SDKs, and UI migration tooling are complete. jira_key values remain null \u2014 no live Jira query found matching 'Platform Readiness: *' epics in RHCLOUD as of this review, and no skill consumes jira_key anymore (Jira gate-linking was removed 2026-07). Prior statuses (unknown/partial/ongoing) predated any epic and were unverified placeholders.",
+  "gates": {
+    "native": {
+      "epic_summary": "Platform Readiness: Native",
+      "jira_key": null,
+      "status": "ready"
+    },
+    "default-workspace": {
+      "epic_summary": "Platform Readiness: Default workspace",
+      "jira_key": null,
+      "status": "ready"
+    },
+    "native-ws-list": {
+      "epic_summary": "Platform Readiness: Native workspace-level list",
+      "jira_key": null,
+      "status": "ready"
+    },
+    "org-level": {
+      "epic_summary": "Platform Readiness: Organization-level",
+      "jira_key": null,
+      "status": "ready"
+    },
+    "root-workspace": {
+      "epic_summary": "Platform Readiness: Root workspace",
+      "jira_key": null,
+      "status": "ready"
+    },
+    "ephemeral-infra": {
+      "epic_summary": "Platform Readiness: Ephemeral infra",
+      "jira_key": null,
+      "status": "ready"
+    },
+    "sdk-client": {
+      "epic_summary": "Platform Readiness: SDK / client",
+      "jira_key": null,
+      "status": "ready"
+    },
+    "ui-platform": {
+      "epic_summary": "Platform Readiness: UI platform",
+      "jira_key": null,
+      "status": "ready"
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.2",
+  "provider": {
+    "name": "Subscription Management"
+  },
+  "service": {
+    "name": "Activation Keys",
+    "slug": "activation-keys"
+  },
+  "jira": {
+    "home_project": "TUSC",
+    "feature_epic_key": "TUSC-271",
+    "label": "kessel-onboarding"
+  },
+  "program": {
+    "wave": 2,
+    "path": "self-service"
+  },
+  "contacts": {
+    "pm": {
+      "name": "Example PM",
+      "email": "pm@example.com"
+    },
+    "em": {
+      "name": "Example EM",
+      "email": "em@example.com"
+    },
+    "tech_lead": {
+      "name": "Example Tech Lead",
+      "email": "tech@example.com"
+    }
+  },
+  "kickoff": {
+    "docs_reviewed": true
+  },
+  "credentials": {
+    "cmdb_registered": "yes",
+    "service_account_status": "stage_only",
+    "notes": ""
+  },
+  "ui_access_checks": "not_required",
+  "tech_stack": {
+    "lang": "Java",
+    "framework": "Quarkus",
+    "auth": "Kessel SDK"
+  },
+  "asset_types": ["activation_key"],
+  "v1_permissions": {
+    "source": "paste",
+    "summary": "Workspace-scoped activation key view/edit; v1 app is config_manager; maps to v2 compound permissions config_manager_activation_keys_view / config_manager_activation_keys_edit via @rbac.add_v1_based_permission.",
+    "items": [
+      "config_manager:activation_keys:read",
+      "config_manager:activation_keys:write"
+    ]
+  },
+  "inventory_reporting": false,
+  "inventory_migration_required": false,
+  "ephemeral": {
+    "uses_bonfire": true,
+    "pre_dev_tooling": null
+  },
+  "patterns": [
+    {
+      "id": "default-workspace",
+      "label": "Default workspace",
+      "confidence": "high",
+      "rationale": "Activation keys are workspace-scoped assets with standard Check calls (StreamedListObjects not required at this scale); no org-level or root-workspace LIST requirements.",
+      "guide_anchor": "/building-with-kessel/how-to/migrate-from-rbac-v1-to-v2/#identify-the-patterns",
+      "asset_types": ["activation_key"]
+    }
+  ],
+  "platform_gates": [
+    {
+      "pattern_id": "default-workspace",
+      "epic_summary": "Platform Readiness: Default workspace",
+      "jira_key": null,
+      "status": "ready"
+    },
+    {
+      "pattern_id": "sdk-client",
+      "epic_summary": "Platform Readiness: SDK / client",
+      "jira_key": null,
+      "status": "ongoing"
+    },
+    {
+      "pattern_id": "ephemeral-infra",
+      "epic_summary": "Platform Readiness: Ephemeral infra",
+      "jira_key": null,
+      "status": "ongoing"
+    }
+  ],
+  "dedup": {
+    "status": "clean",
+    "notes": "Pilot example — no live Jira dedup run",
+    "matches": []
+  },
+  "interview": {
+    "conducted_at": "2026-06-11T00:00:00Z",
+    "participants": ["Example EM", "Example Tech Lead"],
+    "transcript_ref": ""
+  }
+}

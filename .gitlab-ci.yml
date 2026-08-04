@@ -1,0 +1,141 @@
+# kessel-onboarding-agents CI — adapted from the TAILWIND program repo's
+# .gitlab-ci.yml, trimmed to what this repo actually needs.
+#
+# Scope: this is a small, single-contributor internal tool (no LICENSE,
+# CODEOWNERS, registry/, or sandbox/), so only the checks that fit that
+# risk profile are included:
+#
+#   verify:structure       — repo layout sanity (README/AGENTS.md, skill dirs)
+#   verify:skill-metadata   — every SKILL.md has a title + "## When to use"
+#   verify:skills           — SKILL.md frontmatter schema validation
+#   security:secrets        — gitleaks detects committed credentials/tokens
+#   security:pii            — flags real PII / sensitive patterns in docs
+#
+# Deliberately NOT ported from TAILWIND (see AGENTS.md for rationale):
+# security:license (no LICENSE in this repo), MR-hygiene/review bot jobs
+# (single contributor, no bot token configured), registry/sandbox/pages jobs
+# (those directories don't exist here), mcp-npm-audit (no pinned npm deps).
+#
+# Route jobs to Red Hat instance runners (same as the TAILWIND repo).
+# Requires "Turn on instance runners for this project" in Settings → CI/CD →
+# Runners. If pipelines never start, drop the `tags:` block below to fall
+# back to shared runners.
+default:
+  tags:
+    - itup-alm-x86
+
+stages:
+  - verify
+  - security
+
+# ── verify ─────────────────────────────────────────────────────────────────────
+
+verify:structure:
+  stage: verify
+  image: alpine:3.20
+  script:
+    - sh scripts/verify-structure.sh
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Validates structural metadata for every skill SKILL.md file:
+#   • File begins with an H1 heading (# Title)
+#   • File contains a ## When to use section
+#   • No hardcoded /home/<username>/ paths (use ~ or env vars)
+# See scripts/check-skill-metadata.sh.
+verify:skill-metadata:
+  stage: verify
+  image: alpine:3.20
+  variables:
+    GIT_DEPTH: "0"
+  script:
+    - apk add --no-cache grep git
+    - sh scripts/check-skill-metadata.sh
+  artifacts:
+    when: on_failure
+    paths:
+      - /tmp/skill-metadata-report.txt
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+verify:skills:
+  stage: verify
+  image: alpine:3.20
+  before_script:
+    - apk add --no-cache python3 py3-yaml
+  script:
+    - |
+      failed=0
+      for dir in skills/*/; do
+        [ -f "${dir}SKILL.md" ] || continue
+        if ! python3 scripts/quick_validate.py "$dir"; then
+          failed=1
+        fi
+      done
+      exit $failed
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# ── security ───────────────────────────────────────────────────────────────────
+
+# Scans for accidentally committed secrets (tokens, keys, passwords, URLs with
+# creds). Relevant here because docs/configuration.md instructs contributors
+# to create a local .env with a real Jira API token — gitleaks is the safety
+# net if one is ever force-added or pasted into a doc by mistake.
+security:secrets:
+  stage: security
+  image:
+    name: zricethezav/gitleaks:v8.18.4
+    entrypoint: [""]
+  variables:
+    GITLEAKS_CONFIG: .gitleaks.toml
+    REPORT_FILE: gl-secret-detection-report.json
+  script:
+    - |
+      echo "==> Running gitleaks secret scan …"
+      gitleaks detect \
+        --source . \
+        --config "$GITLEAKS_CONFIG" \
+        --report-format json \
+        --report-path "$REPORT_FILE" \
+        --exit-code 1 \
+        --redact \
+        --no-git
+      echo "==> No secrets detected."
+  artifacts:
+    when: always
+    reports:
+      secret_detection: gl-secret-detection-report.json
+    paths:
+      - gl-secret-detection-report.json
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Scans for PII and sensitive content patterns that violate
+# docs/responsible-use.md:
+#   • Real email addresses (non-example.com/org/net, non-redhat.com domains)
+#   • Real routable IP addresses (not RFC 5737 / RFC 3849 test ranges)
+#   • Internal-looking hostnames (.corp., .internal, etc.)
+#   • Potential credential patterns in Markdown/JSON
+security:pii:
+  stage: security
+  image: alpine:3.20
+  variables:
+    GIT_DEPTH: "0"
+  script:
+    - apk add --no-cache grep git
+    - sh scripts/check-pii.sh
+  artifacts:
+    when: on_failure
+    paths:
+      - /tmp/pii-report.txt
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
