@@ -53,6 +53,7 @@ Load and execute [agents/onboarding-interview.md](../agents/onboarding-interview
 | `--feature-epic KEY` | No | Existing feature epic for relates-to link |
 | `--headless` | No | Build profile from file/notes; skip live Q&A |
 | `--save-only` | No | Write handoff; do not invoke Provisioner |
+| `--test-mode` | No | Activates the Kessel blindfold — ignores existing Kessel SDK, permission classes, and client code during codebase analysis. Artifacts written to `artifacts/test/{slug}/` instead of `artifacts/profiles/`. Gate 2 offers Auto-validate instead of Provisioner dispatch. |
 
 ## Return value
 

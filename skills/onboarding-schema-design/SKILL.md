@@ -34,12 +34,49 @@ Does **not** create PRs, Jira issues, or any external resources. All output is l
 | `codebase_ref` | **yes** | From profile `interview.codebase_ref` or `--codebase_ref` flag |
 | `rbac_config_path` | no | Local path to rbac-config repo root. Used by Step 8.5 for KSL syntax check and permissions/roles structural validation. If omitted, checks `~/dev/rbac-config` and `../rbac-config`. |
 | `output_dir` | no | Default `./artifacts/schemas/{slug}/` |
+| `test_mode` | no | When `true`, activates the Kessel blindfold and routes output to `{artifacts_dir}/test/{slug}/schemas/` |
 
 ## Prerequisites
 
 - ServiceProfile must have `asset_types[]`, `v1_permissions`, and `patterns[]` populated (run the interview skill first)
 - `dedup.status` should not be `duplicate_found`
 - **Codebase access is required.** The service's source code provides essential context for resource type modeling, reporter field definitions, and permission mapping. If `interview.codebase_ref` is null and `--codebase_ref` is not provided, **stop and ask** for a repo URL, local path, or archive before proceeding. Do not attempt to generate schemas without codebase analysis — the output would require too much manual correction to be useful.
+
+## Test mode
+
+When `test_mode = true` (set via `--test-mode` flag or passed from the interview agent):
+
+**Banner:** Display `⚗️ TEST MODE — Existing Kessel schemas and implementation will be ignored. Outputs written to artifacts/test/{slug}/schemas/`.
+
+**Output routing:** Write all artifacts to `{artifacts_dir}/test/{slug}/schemas/` instead of `{artifacts_dir}/schemas/{slug}/`.
+
+**Codebase blindfold — ignore during Step 0 analysis:**
+
+| What to ignore | Examples |
+|---|---|
+| Existing KSL files for this service | Any `.ksl` in `rbac-config/configs/*/schemas/src/` matching the service namespace |
+| Existing inventory-api resource schema dirs | Any `data/schema/resources/{type}/` dirs for this service's asset types |
+| Existing Kessel permission class definitions | `KesselPermission`, `KesselResourceType`, v2 permission name constants |
+| Existing Kessel client code | `lib/kessel.py`, `ClientBuilder` setup, `Check`/`CheckBulk` call sites, `kessel.rbac.v2.list_workspaces()` (Kessel SDK — distinct from `/api/rbac/v2/workspaces/` RBAC REST calls which are kept) |
+| `migrated_apps.lst` entries for this service | Treat the service as not yet migrated |
+
+**Still analyse — derive schemas from pre-Kessel signals:**
+
+Every service onboarding will already be using the RBAC v1 service — read all of that integration code, not just enums and constants.
+
+| What to keep | Why |
+|---|---|
+| Domain model classes, DB columns | Source of reporter-specific JSON Schema fields |
+| **All RBAC service integration code (v1 and v2)** | The migration surface — read both v1 and v2 fully |
+| v1 RBAC enums/constants | `RbacPermission`, `RbacResourceType` — the v1 permission surface |
+| v1 RBAC middleware and permission-checking logic | Full middleware file — reveals the complete permission enforcement model |
+| v1 RBAC client calls | `RBAC_ROUTE`, `get_rbac_filter()`, any function calling `/api/rbac/v1/access/` |
+| v2 RBAC REST API calls | `get_rbac_workspace_by_id()`, `get_rbac_workspaces()`, `RBAC_V2_ROUTE`, any direct call to `/api/rbac/v2/workspaces/` — the RBAC service's own workspace API, not Kessel. Reveals whether the service already models workspace/group concepts. |
+| Existing rbac-config permissions/roles files for this service | `permissions/{app}.json`, `roles/{app}.json` — the definitions being migrated into KSL |
+| API resource names and endpoint handlers | Confirms asset type scope and permission surface |
+| `patterns[]` rationale annotations from the interview | If the interview annotated an asset type as "uses existing rbac.workspace type — do NOT generate a public type", respect that instruction in Step 1 classification — do not generate a `public type` or inventory-api resource schema for that asset type |
+
+**Reporter name in test mode:** Since existing Kessel client code is ignored, the reporter name cannot be inferred from namespace config. Ask the reporter Q&A question cold (Step 2) for all asset types that need a resource schema.
 
 ## Configuration
 

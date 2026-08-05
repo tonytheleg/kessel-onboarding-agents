@@ -79,7 +79,13 @@ Confirm with EM:
 2. EM (or delegate) available
 3. Home Jira project
 
-Parse command flags: `--provider`, `--service`, `--feature-epic`, `--headless`, `--save-only`.
+Parse command flags: `--provider`, `--service`, `--feature-epic`, `--headless`, `--save-only`, `--test-mode`.
+
+**`--test-mode` behaviour:**
+- Passes `test_mode = true` to `onboarding-interview-conduct` — activates the Kessel blindfold during codebase analysis (see that skill's Step 1.5).
+- Routes all artifacts to `{artifacts_dir}/test/{slug}/profiles/` instead of `{artifacts_dir}/profiles/`. Nothing is written to the standard profiles directory.
+- Prefixes the session with a banner: `⚗️ TEST MODE — Kessel-specific signals in the codebase are being ignored. Outputs written to artifacts/test/{slug}/.`
+- At Gate 2, replaces the provisioner dispatch option with **Auto-validate** — runs `skills/onboarding-validate-interview/SKILL.md` against the test profile, comparing it to the service's real implementation, and writes a validation report to `{artifacts_dir}/test/{slug}/validation-report.md`.
 
 ### Step 2 — Conduct interview
 
