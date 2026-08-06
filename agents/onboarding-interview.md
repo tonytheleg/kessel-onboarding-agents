@@ -45,6 +45,7 @@ Does **not** create or update Jira issues.
 | `codebase_ref` | string | no |
 | `headless` | flag | no |
 | `save_only` | flag | no |
+| `test_mode` | flag | no |
 
 ## Outputs
 
@@ -79,13 +80,19 @@ Confirm with EM:
 2. EM (or delegate) available
 3. Home Jira project
 
-Parse command flags: `--provider`, `--service`, `--feature-epic`, `--headless`, `--save-only`.
+Parse command flags: `--provider`, `--service`, `--feature-epic`, `--headless`, `--save-only`, `--test-mode`.
+
+**`--test-mode` behaviour:**
+- Passes `test_mode = true` to `onboarding-interview-conduct` — activates the Kessel blindfold during codebase analysis (see that skill's Step 1.5).
+- Routes all artifacts to `{artifacts_dir}/test/{slug}/profiles/` instead of `{artifacts_dir}/profiles/`. Nothing is written to the standard profiles directory.
+- Prefixes the session with a banner: `⚗️ TEST MODE — Kessel-specific signals in the codebase are being ignored. Outputs written to artifacts/test/{slug}/.`
+- At Gate 2, **skip the interactive schema-design / provisioner prompt entirely** and return the profile path to the orchestrating command. The `/kessel-onboarding:test` command invokes schema-design and then validate-interview as its subsequent steps — the interview agent does not auto-invoke them.
 
 ### Step 2 — Conduct interview
 
 Invoke `skills/onboarding-interview-conduct/SKILL.md`.
 
-Pass: `service_name`, `provider_name`, `feature_epic_key`, `headless`, `intake_notes`, `codebase_ref`.
+Pass: `service_name`, `provider_name`, `feature_epic_key`, `headless`, `intake_notes`, `codebase_ref`, `test_mode`.
 
 ### Step 3 — Suggest patterns
 

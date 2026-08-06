@@ -33,7 +33,10 @@ Compares a completed onboarding interview ServiceProfile against the service's a
 | Feature flag strategy | Was the dual-path gating strategy correctly anticipated? |
 | Ephemeral / Bonfire | Was the pre-dev tooling correctly identified? |
 
-Gaps are classified as **Type A** (interview missed something — candidate for skill improvement) or **Type B** (detail correctly deferred to Phase 2 — expected).
+Gaps are classified as:
+- **Type A** — interview missed something (candidate for interview skill improvement)
+- **Type B** — detail correctly deferred to Phase 2 (expected)
+- **Type C** — schema-design generated something wrong (candidate for schema-design skill improvement; only surfaced when `--schema_artifacts_path` is provided)
 
 Nothing is written to Jira or any external system.
 
@@ -65,14 +68,17 @@ Load and execute [skills/onboarding-validate-interview/SKILL.md](../skills/onboa
 | `--codebase_ref PATH` | Yes | GitHub/GitLab URL or local path to the service's source repo |
 | `--rbac_config_path PATH` | No | Local path to rbac-config repo root. Skill will check `~/dev/rbac-config` if not provided. |
 | `--inventory_api_path PATH` | No | Local path to inventory-api repo root. Skill will check common Go module paths if not provided. |
+| `--schema_artifacts_path PATH` | No | Path to schema-design output directory (e.g. `artifacts/test/{slug}/schemas/`). Enables dimensions 13–16 scoring the generated draft schemas against the real ones. Automatically set by `/kessel-onboarding:test`. |
+| `--output_path PATH` | No | Custom path for the validation report. Default: `{artifacts_dir}/validation/{slug}-validation-report.md`. |
 
 ## Return value
 
-Path to `{artifacts_dir}/validation/{slug}-validation-report.md` — a scored alignment report with:
-- Dimension scorecard (12 dimensions, each ✅/⚠️/❌/➖/⏭️)
+Path to the validation report — a scored alignment report with:
+- **Interview scorecard** (dimensions 1–12, each ✅/⚠️/❌/➖/⏭️)
+- **Schema-design scorecard** (dimensions 13–16 — only present when `--schema_artifacts_path` provided)
 - Detail findings per dimension with file references
-- Gap classification (Type A: interview improvement candidates vs Type B: expected deferrals)
-- Recommendations for interview skill refinement
+- Gap classification: Type A (interview improvements), Type B (expected deferrals), Type C (schema-design improvements)
+- Recommendations for skill refinement
 
 ## When to run
 

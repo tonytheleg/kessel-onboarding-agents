@@ -26,6 +26,7 @@ The following are **standalone skills** (no full agent required) invoked directl
 | `onboarding-preflight` | `/kessel-onboarding:preflight` | Validates config, MCP, Jira access — run once per machine |
 | `onboarding-schema-design` | `/kessel-onboarding:schema-design` | Generates draft resource schemas (inventory-api) and permissions schemas (rbac-config) from a ServiceProfile + codebase analysis |
 | `onboarding-validate-interview` | `/kessel-onboarding:validate-interview` | Scores an interview's accuracy against a service's actual Kessel implementation; produces a structured gap report |
+| *(orchestration)* | `/kessel-onboarding:test` | Full test loop — interview + schema-design with Kessel blindfold, then auto-validate. No dedicated skill file; orchestrated by the `test.md` command. |
 
 ## Skill locations
 
@@ -46,10 +47,11 @@ skills/
 ```
 commands/
 ├── preflight.md          # /kessel-onboarding:preflight
-├── interview.md          # /kessel-onboarding:interview
+├── interview.md          # /kessel-onboarding:interview  (supports --test-mode)
 ├── provision.md          # /kessel-onboarding:provision
-├── schema-design.md      # /kessel-onboarding:schema-design
-└── validate-interview.md # /kessel-onboarding:validate-interview
+├── schema-design.md      # /kessel-onboarding:schema-design  (supports --test-mode)
+├── validate-interview.md # /kessel-onboarding:validate-interview
+└── test.md               # /kessel-onboarding:test  (full test loop: interview + schema-design + validate)
 ```
 
 ## Jira project routing

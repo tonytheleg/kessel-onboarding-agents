@@ -30,6 +30,7 @@ Read `~/.config/kessel-onboarding/config.json`. Use `artifacts_dir` for output p
 | `intake_notes` | no | Pasted doc or file for `--headless` |
 | `codebase_ref` | no | GitHub/GitLab URL, local path, or archive to the service's repo — see [Step 1.5](#step-15--codebase-reference-optional) |
 | `headless` | no | Skip live Q&A |
+| `test_mode` | no | When `true`, activates the Kessel blindfold during codebase analysis and routes all artifacts to `{artifacts_dir}/test/{slug}/profiles/` instead of `{artifacts_dir}/profiles/` |
 
 ## Execution
 
@@ -69,6 +70,49 @@ Ask once, before Group 1: "Do you have a link to the service's repo (GitHub or G
 
 For each field with a match, draft the value with a one-line rationale citing what was found (e.g. "`pom.xml` has Quarkus + a `kessel-sdk` dependency → lang=Java, framework=Quarkus, auth=Kessel SDK"). Carry these drafts into Step 2 — see the confirmation rule below.
 
+#### Test mode: codebase analysis rules
+
+When `--test-mode` is active, apply a **Kessel blindfold** during codebase analysis. The goal is to simulate running this interview against a service that has not yet integrated with Kessel, even if the actual codebase already has.
+
+**Ignore entirely — pretend these do not exist:**
+
+| What to ignore | Examples |
+|---|---|
+| Kessel SDK dependency | `kessel-sdk`, `kessel-sdk[auth]`, `github.com/project-kessel/inventory-client-go` in any manifest |
+| Kessel client code | `lib/kessel.py`, `internal/kessel/`, any file initialising `ClientBuilder` or `Kessel{}` |
+| Kessel permission classes | `KesselPermission`, `KesselResourceType`, `KesselResourceTypes`, `HostKesselResourceType`, etc. |
+| Kessel feature flags | `FLAG_RBAC_WORKSPACES`, `bypass_kessel`, `BYPASS_KESSEL`, `kessel_auth_enabled`, any flag gating Kessel behaviour |
+| Existing Kessel Check/List calls | `Check(`, `CheckBulk(`, `CheckForUpdate(`, `ListAllowedWorkspaces(`, `list_workspaces(` via Kessel SDK |
+| Inventory reporting calls | `ReportResource(`, `report_resource(`, outbox publishers sending to Kessel inventory |
+| `@access` decorators backed by Kessel | Decorators that reference `KesselResourceTypes.*` |
+| Kessel SDK workspace calls | `list_workspaces(` from `kessel.rbac.v2` — Kessel SDK method, not the RBAC service REST API |
+
+**Still analyse — these reflect the pre-Kessel state:**
+
+Every service onboarding to Kessel will almost certainly already be integrated with the RBAC v1 service. That integration code is exactly the migration surface — read all of it.
+
+| What to keep | Why |
+|---|---|
+| Language, framework (minus Kessel SDK) | Tech stack is independent of Kessel integration |
+| Domain model classes, DB migrations | These determine what asset types exist |
+| **All RBAC service integration code (v1 and v2)** | Services use both RBAC v1 and v2 REST APIs — read both fully, not just constants |
+| v1 RBAC permission enums/constants | `RbacPermission`, `RbacResourceType`, `inventory:hosts:read` |
+| v1 RBAC middleware and permission-checking logic | Full middleware file (e.g. `lib/middleware.py`, `internal/rbac/`) — read the entire RBAC v1 enforcement flow |
+| v1 RBAC client calls | `get_rbac_filter()`, `get_rbac_url()`, `rbac_permission_denied()`, any function calling `/api/rbac/v1/access/` |
+| v2 RBAC REST API calls | `get_rbac_workspace_by_id()`, `get_rbac_workspaces()`, `RBAC_V2_ROUTE`, any function calling `/api/rbac/v2/workspaces/` — the RBAC service's own workspace API. Many services call this directly to look up workspace IDs; it is RBAC service integration, not Kessel. Reveals whether groups/workspaces are already a concept in the service. |
+| Permission-checking decorators (RBAC-backed) | `@rbac_permission`, `@permission_required`, or any decorator that calls the RBAC service (v1 or v2) — not Kessel-backed ones |
+| Existing rbac-config permissions/roles files for this service | `permissions/{app}.json`, `roles/{app}.json` in rbac-config — these are the permission definitions being migrated |
+| `/rbac/v1/access` route calls | Determines `ui_access_checks` value and permission surface |
+| API endpoints and handlers | Reveals the permission surface |
+| ClowdApp config, IQE test plugin | Determines ephemeral/Bonfire answer |
+| CMDB/CIAM credential config | Service account status (env vars for auth, not Kessel-specific) |
+
+**Distinguishing RBAC service v2 from Kessel:** `/api/rbac/v2/workspaces/` is the RBAC service's own workspace REST API — keep it. `kessel.rbac.v2.list_workspaces()` is a Kessel SDK method that happens to call a similar endpoint via Kessel — ignore it. If in doubt, check the import: RBAC service calls use `requests` or `httpx`; Kessel SDK calls use the `kessel.*` package.
+
+When a file contains both RBAC service logic and Kessel integration code (e.g. `lib/middleware.py`), read the entire RBAC service section (v1 and v2) and skip only the Kessel-specific sections. Do not skip the file.
+
+Annotate drafted values with `(test mode — derived from pre-Kessel signals)` in the summary so the validation skill knows what was inferred vs asked cold.
+
 ### Step 2 — Interview (one fixed group per turn)
 
 Ask only for **missing** fields, one group at a time, in this fixed order. Never combine groups into a single message, and never send more than one group before the EM responds — this applies in both single-service and multi-service (provider-context) sessions.
@@ -87,13 +131,21 @@ Skip a group entirely if every field in it is already known (from provider conte
 
 **Repo-drafted fields (groups 4, 5, 6):** if Step 1.5 produced a draft for a field in that group's turn, present the draft and its rationale in place of the raw question and ask the EM/tech lead to confirm or correct it — do not skip the group or auto-accept the draft. Record whatever they confirm (which may differ from the draft) as the final value, and mark that field `(confirmed from repo analysis)` in the narrative summary. A field with no draft in an otherwise-drafted group is still asked normally.
 
-**Group 5 follow-up — asset type ownership:** After the EM confirms `asset_types[]`, ask for each type: "Is `{asset_type}` modeled as a new Kessel resource type your service defines and owns, or does it map to an existing Kessel type like `rbac.workspace`?"
+**Group 5 mandatory follow-up — asset type ownership:**
 
-This question is specifically to catch the case where an asset type uses an existing platform type rather than introducing a new service-specific one. If the EM confirms an asset type maps to `rbac.workspace`:
+**Rule: this question is required for every confirmed asset type. Do not skip it, even if the answer seems obvious from codebase analysis.**
 
-- Record this in the **narrative summary** under that asset type's entry (e.g. "group — maps to rbac.workspace; permissions handled by rbac.ksl").
-- **Update or annotate the pattern rationale** for that asset type in `patterns[]` to reflect this (e.g. add "uses existing rbac.workspace type" to the rationale string). Schema-design Step 1 reads `patterns[]` as its authoritative classification source — a clear rationale note is the correct handoff channel. Do not use `docs_gaps[]` (for unanswered doc questions only) or create a separate field (`asset_types` is `string[]`).
-- If the suggested pattern (`native`, `native-ws-list`, `default-workspace`) is inconsistent with the EM confirming the type uses `rbac.workspace`, flag the contradiction and resolve it before the interview completes — the pattern must be corrected or the ownership answer re-confirmed.
+After the EM confirms `asset_types[]`, ask for **each type individually**:
+
+> "Is `{asset_type}` a new Kessel resource type your service will define and own, or does it correspond to an existing Kessel platform type — specifically `rbac.workspace` (e.g. groups, namespaces, projects that ARE the workspace hierarchy rather than living within it)?"
+
+This catches the common case where an asset type derived from a v1 RBAC resource (e.g. `RbacResourceType.GROUPS`) maps to the existing `rbac.workspace` Kessel type rather than requiring a new `public type` definition. If this is not asked, schema-design will generate a `public type group` that shouldn't exist — and the mismatch will propagate through the KSL, inventory-api schema, and roles files.
+
+If the EM confirms an asset type maps to `rbac.workspace`:
+
+- Record it in the **narrative summary** (e.g. "group — maps to rbac.workspace; no new KSL type needed; permissions handled via rbac.ksl workspace type").
+- **Annotate the pattern rationale** in `patterns[]` for that asset type with "uses existing rbac.workspace type — schema-design must NOT generate a public type definition". Schema-design Step 1 reads `patterns[]` as its authoritative source.
+- If the previously suggested pattern (e.g. `native`) is inconsistent with the EM's answer, flag the inconsistency immediately and resolve it in this group's turn — do not carry an unresolved contradiction into suggest-patterns.
 
 **Important scope limit:** This follow-up identifies whether an asset type uses an existing platform type. It does **not** independently determine whether the schema-design skill generates a KSL type definition or inventory-api schema — those decisions are made solely by schema-design Step 1 using `patterns[]` and `inventory_migration_required`. "Service-owned" alone does not imply a KSL `public type`; that depends on whether the pattern is `native` or `native-ws-list` specifically.
 
@@ -122,12 +174,14 @@ Assemble object per schema v1.3 (accept 1.0, 1.1, 1.2, or 1.3; new fields absent
 
 ### Step 4 — Write artifacts
 
-```
-{artifacts_dir}/profiles/{slug}-profile.json
-{artifacts_dir}/profiles/{slug}-summary.md
-```
+Output paths depend on `test_mode`:
 
-Create `artifacts/profiles/` if needed.
+| `test_mode` | Profile JSON | Narrative summary |
+|---|---|---|
+| `false` (default) | `{artifacts_dir}/profiles/{slug}-profile.json` | `{artifacts_dir}/profiles/{slug}-summary.md` |
+| `true` | `{artifacts_dir}/test/{slug}/profiles/{slug}-profile.json` | `{artifacts_dir}/test/{slug}/profiles/{slug}-summary.md` |
+
+Create the target directory if it does not exist.
 
 Summary format: see [reference.md](reference.md#narrative-summary-template).
 
@@ -155,6 +209,8 @@ Return both paths to the orchestrating agent.
 
 ## Changelog
 
+- 2026-08: Elevated Group 5 asset-type ownership question to a mandatory rule (must be asked for every asset type, not skipped); catches types like `group` that map to `rbac.workspace` rather than requiring a new `public type`. Expanded blindfold keep-list to cover all RBAC service integration code (v1 AND v2) — services use both `/api/rbac/v1/access/` and `/api/rbac/v2/workspaces/` and both are valid pre-Kessel signals. Added disambiguation rule: RBAC service v2 REST calls (kept) vs Kessel SDK `kessel.rbac.v2` calls (ignored).
+- 2026-07: Added Kessel blindfold rules to Step 1.5 for `--test-mode` — ignores existing SDK, permission classes, and client code; derives answers from pre-Kessel signals only; annotates drafted values with `(test mode)` marker for the validation skill.
 - 2026-07: Group 5 — ask whether each asset type is service-owned or maps to an existing `rbac.workspace` type; passes ownership context to schema-design. Group 6 — always include wildcard resource permissions (`{app}:*:read`, `{app}:*:*`) in codebase-drafted permission lists.
 - 2026-07: Added optional `codebase_ref` input and Step 1.5 for codebase-analysis-driven drafts (schema v1.3). Added `new` ui_access_checks value. Fixed question order to one group per turn.
 - 2026-07: Initial version — accept schema v1.0/1.1/1.2; fixed 7-group interview order; docs-gap capture rule.

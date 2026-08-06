@@ -41,6 +41,7 @@ Load and execute [skills/onboarding-schema-design/SKILL.md](../skills/onboarding
 | `--profile PATH` | Yes | Path to `{slug}-profile.json` from Interview Agent |
 | `--codebase_ref PATH` | Yes* | GitHub/GitLab URL or local path to service repo. *Can be omitted if the profile already has `interview.codebase_ref` set; otherwise the skill will ask for it before proceeding. |
 | `--output_dir PATH` | No | Output directory (default `./artifacts/schemas/{slug}/`) |
+| `--test-mode` | No | Activates the Kessel blindfold — ignores existing KSL files, inventory-api resource schema dirs, and Kessel client code during codebase analysis. Artifacts written to `artifacts/test/{slug}/schemas/` instead of `artifacts/schemas/{slug}/`. |
 
 ## Return value
 
