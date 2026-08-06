@@ -129,12 +129,14 @@ Do not block generation on missing tools — report availability and proceed. Va
 
 `patterns[]` is the sole authoritative source for classification. For each entry in `asset_types[]`, determine which schema artifacts it needs based on its matched pattern:
 
-| Pattern | Needs inventory-api resource schema? | Needs KSL type definition? |
+| Pattern | Needs inventory-api resource schema? | Needs KSL `public type` definition? |
 |---|---|---|
 | `native` or `native-ws-list` | Yes (when `inventory_migration_required = true`) | Yes — `public type` with workspace relation |
-| `default-workspace` | Yes (when `inventory_migration_required = true`) | No — workspace-level permissions only |
+| `default-workspace` | Yes (when `inventory_migration_required = true`) | **Yes** — `public type` with workspace relation |
 | `root-workspace` | No | No — workspace-level permissions only |
 | `org-level` | No | No — workspace-level permissions only |
+
+**Why `default-workspace` requires a `public type`:** When resources are reported to inventory-api, the consumer always writes a workspace relationship tuple of the form `{namespace}/{type}:{id}#workspace@rbac/workspace:{workspace_id}` into SpiceDB. SpiceDB will reject this write with `object definition not found` if the type is not declared in the schema. This is required regardless of whether the application calls `Check` on the resource directly or on the default workspace — SpiceDB must know the type exists to store the tuple.
 
 If the interview narrative summary notes that an asset type "maps to rbac.workspace" (from the Group 5 ownership follow-up) but its pattern is `native` or `native-ws-list`, that is a contradiction — pause and ask the EM to confirm which is correct before proceeding. Do not silently override the pattern; pattern classification and platform-type ownership must agree.
 
@@ -142,7 +144,7 @@ Present a classification table to the EM/tech lead for confirmation before proce
 
 Asset types matched to `root-workspace` or `org-level` do not get inventory-api resource schemas — they use the existing `rbac.workspace` type for permission checks and do not report resources to inventory.
 
-Asset types matched to `native` or `native-ws-list` but with `inventory_migration_required = false` also skip resource schema generation — flag this as a follow-up for when the team is ready to report to inventory.
+Asset types matched to `native`, `native-ws-list`, or `default-workspace` but with `inventory_migration_required = false` also skip resource schema and KSL type generation — flag this as a follow-up for when the team is ready to report to inventory.
 
 ### Step 2 — Reporter Q&A (one group per asset type needing a resource schema)
 
@@ -210,7 +212,7 @@ This determines whether the KSL file needs:
 
 **Step 3d — Extension point (only for services defining `public type` resources)**
 
-If any asset type requires a KSL `public type` definition (native/native-ws-list pattern), ask:
+If any asset type requires a KSL `public type` definition (native, native-ws-list, or default-workspace pattern with inventory migration), ask:
 
 > "Will other services in the platform need to check permissions on individual `{asset_type}` records your service manages — not just 'does the user have permission in this workspace', but 'does the user have permission on this specific `{asset_type}`?' If yes, your KSL needs a public extension so those services can scope their own permissions to your resource instances."
 

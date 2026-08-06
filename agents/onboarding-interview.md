@@ -83,9 +83,9 @@ Confirm with EM:
 Parse command flags: `--provider`, `--service`, `--feature-epic`, `--headless`, `--save-only`, `--test-mode`.
 
 **`--test-mode` behaviour:**
-- Passes `test_mode = true` to `onboarding-interview-conduct` — activates the Kessel blindfold during codebase analysis (see that skill's Step 1.5).
+- Passes `test_mode = true` to `onboarding-interview-conduct` — activates the Kessel blindfold during codebase analysis (ignores existing Kessel SDK, permission classes, and client code; derives answers from pre-Kessel signals only — see that skill's Step 1.5).
 - Routes all artifacts to `{artifacts_dir}/test/{slug}/profiles/` instead of `{artifacts_dir}/profiles/`. Nothing is written to the standard profiles directory.
-- Prefixes the session with a banner: `⚗️ TEST MODE — Kessel-specific signals in the codebase are being ignored. Outputs written to artifacts/test/{slug}/.`
+- Prefixes the session with a banner: `⚗️ TEST MODE — Kessel-specific signals in the codebase are being ignored. Outputs written to artifacts/test/{slug}/`.
 - At Gate 2, **skip the interactive schema-design / provisioner prompt entirely** and return the profile path to the orchestrating command. The `/kessel-onboarding:test` command invokes schema-design and then validate-interview as its subsequent steps — the interview agent does not auto-invoke them.
 
 ### Step 2 — Conduct interview
@@ -211,6 +211,7 @@ See wave2 pilot.
 
 ## Changelog
 
+- 2026-08: Added `test_mode` to inputs table, Step 1 flag parsing, and Step 2 pass-through; documented test-mode Gate 2 behaviour (skip interactive prompt, return profile path to orchestrating command).
 - 2026-07: Added "Design schemas" option to Gate 2 — invokes `onboarding-schema-design` skill to generate draft resource and permissions schemas as a Phase 2 head start.
 - 2026-07: Added optional `codebase_ref` input, passed through to `onboarding-interview-conduct` so it can draft tech-stack/UI-access/permissions answers from repo analysis for the EM/tech lead to confirm (see that skill's Step 1.5).
 - 2026-07: Added a preflight check step to Step 0.
