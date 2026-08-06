@@ -30,6 +30,7 @@ Read `~/.config/kessel-onboarding/config.json`. Use `artifacts_dir` for output p
 | `intake_notes` | no | Pasted doc or file for `--headless` |
 | `codebase_ref` | no | GitHub/GitLab URL, local path, or archive to the service's repo — see [Step 1.5](#step-15--codebase-reference-optional) |
 | `headless` | no | Skip live Q&A |
+| `test_mode` | no | When `true`, activates the Kessel blindfold during codebase analysis and routes all artifacts to `{artifacts_dir}/test/{slug}/profiles/` instead of `{artifacts_dir}/profiles/` |
 
 ## Execution
 
@@ -173,12 +174,14 @@ Assemble object per schema v1.3 (accept 1.0, 1.1, 1.2, or 1.3; new fields absent
 
 ### Step 4 — Write artifacts
 
-```
-{artifacts_dir}/profiles/{slug}-profile.json
-{artifacts_dir}/profiles/{slug}-summary.md
-```
+Output paths depend on `test_mode`:
 
-Create `artifacts/profiles/` if needed.
+| `test_mode` | Profile JSON | Narrative summary |
+|---|---|---|
+| `false` (default) | `{artifacts_dir}/profiles/{slug}-profile.json` | `{artifacts_dir}/profiles/{slug}-summary.md` |
+| `true` | `{artifacts_dir}/test/{slug}/profiles/{slug}-profile.json` | `{artifacts_dir}/test/{slug}/profiles/{slug}-summary.md` |
+
+Create the target directory if it does not exist.
 
 Summary format: see [reference.md](reference.md#narrative-summary-template).
 
