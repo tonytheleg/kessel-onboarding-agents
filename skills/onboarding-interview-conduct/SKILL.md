@@ -209,8 +209,9 @@ Return both paths to the orchestrating agent.
 
 ## Changelog
 
-- 2026-08: Added `test_mode` to inputs table; updated Step 4 to document conditional artifact routing (`{artifacts_dir}/profiles/` vs `{artifacts_dir}/test/{slug}/profiles/` when `test_mode = true`). Elevated Group 5 asset-type ownership question to a mandatory rule; expanded blindfold keep-list to cover RBAC service integration code (v1 AND v2) with disambiguation rule for RBAC service REST vs Kessel SDK calls.
-- 2026-07: Added Kessel blindfold rules to Step 1.5 for `--test-mode` — ignores existing SDK, permission classes, and client code; derives answers from pre-Kessel signals only; annotates drafted values with `(test mode)` marker for the validation skill.
+- 2026-08: Added `test_mode` to inputs table; updated Step 4 to document conditional artifact routing (`{artifacts_dir}/profiles/` vs `{artifacts_dir}/test/{slug}/profiles/` when `test_mode = true`).
+- 2026-08: Elevated Group 5 asset-type ownership question to a mandatory rule (must be asked for every asset type, not skipped); catches types like `group` that map to `rbac.workspace` rather than requiring a new `public type`. Expanded blindfold keep-list to cover all RBAC service integration code (v1 AND v2) with disambiguation rule: RBAC service REST calls (kept) vs Kessel SDK calls (ignored).
+- 2026-08: Added Kessel blindfold rules to Step 1.5 for `--test-mode` — ignores existing Kessel SDK, permission classes, and client code; derives answers from pre-Kessel signals only; annotates drafted values with `(test mode)` marker for the validation skill.
 - 2026-07: Group 5 — ask whether each asset type is service-owned or maps to an existing `rbac.workspace` type; passes ownership context to schema-design. Group 6 — always include wildcard resource permissions (`{app}:*:read`, `{app}:*:*`) in codebase-drafted permission lists.
 - 2026-07: Added optional `codebase_ref` input and Step 1.5 for codebase-analysis-driven drafts (schema v1.3). Added `new` ui_access_checks value. Fixed question order to one group per turn.
 - 2026-07: Initial version — accept schema v1.0/1.1/1.2; fixed 7-group interview order; docs-gap capture rule.

@@ -41,20 +41,20 @@ Before running `kessel-up`, the taskmanager schemas need to be loaded into both 
 ```bash
 # 1. Load the resource schema into inventory-api and regenerate the cache
 cp -r artifacts/schemas/task-manager/inventory-api/task \
-      ~/go/src/github.com/tonytheleg/inventory-api/data/schema/resources/
-cd ~/go/src/github.com/tonytheleg/inventory-api
+      /path/to/inventory-api/data/schema/resources/
+cd /path/to/inventory-api
 go run main.go preload-schema        # regenerates schema_cache.json (mounted by compose)
 
 # 2. Add the KSL to rbac-config and compile to schema.zed
 cp artifacts/schemas/task-manager/rbac-config/schemas/src/taskmanager.ksl \
-   ~/dev/rbac-config/configs/stage/schemas/src/
-echo "taskmanager" >> ~/dev/rbac-config/configs/stage/schemas/migrated_apps.lst
-cd ~/dev/rbac-config && make ksl-test-schema-stage
+   /path/to/rbac-config/configs/stage/schemas/src/
+echo "taskmanager" >> /path/to/rbac-config/configs/stage/schemas/migrated_apps.lst
+cd /path/to/rbac-config && make ksl-test-schema-stage
 # Compiled schema written to: _private/test-schema/stage-schema.zed
 
 # 3. Start the full Kessel stack with the compiled schema
-cd ~/go/src/github.com/tonytheleg/inventory-api
-SCHEMA_ZED_FILE=~/dev/rbac-config/_private/test-schema/stage-schema.zed make kessel-up
+cd /path/to/inventory-api
+SCHEMA_ZED_FILE=/path/to/rbac-config/_private/test-schema/stage-schema.zed make kessel-up
 ```
 
 Wait for all services to be healthy (the script will show progress). Then start TaskManager.
