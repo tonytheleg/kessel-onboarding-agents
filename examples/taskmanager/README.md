@@ -1,8 +1,39 @@
 # TaskManager — Kessel Onboarding Demo Service
 
-A simple Go HTTP service used to demonstrate the Kessel onboarding skills. TaskManager manages tasks in workspaces and reports them to Kessel Inventory.
+TaskManager is a simple team task-tracking service used to demonstrate the Kessel onboarding skills live. Teams use it to create and manage tasks within workspaces, assign them to users, and track progress from open through to done.
 
 This service is intentionally **not pre-onboarded** — the onboarding skills run against it live during the demo.
+
+---
+
+## What does it do?
+
+| Operation | HTTP | Description |
+|---|---|---|
+| Create task | `POST /tasks` | Creates a new task in a workspace |
+| List tasks | `GET /tasks` | Returns all tasks |
+| Get task | `GET /tasks/{id}` | Returns a single task |
+| Delete task | `DELETE /tasks/{id}` | Removes a task |
+
+A task has a **title**, **status** (`open`, `in_progress`, `done`), **workspace ID**, and optional **assignee ID**.
+
+## Current state (before Kessel)
+
+TaskManager stores tasks in memory and enforces no access control — any user can read or modify any task. There is no way to restrict tasks by workspace or user, and the platform has no record of what tasks exist.
+
+## Why Kessel?
+
+By onboarding to Kessel, TaskManager gains workspace-based access control: inventory reporting (tasks registered as resources), permission checking (Kessel decides who can view or edit), and workspace scoping (users only see tasks in workspaces they belong to).
+
+## Resource type
+
+| Field | Value |
+|---|---|
+| Resource type | `task` |
+| Reporter type | `TASKMANAGER` |
+| Common fields | `workspace_id` |
+| Reporter fields | `title`, `status`, `assignee_id` |
+| Permissions | `taskmanager_task_view` (read), `taskmanager_task_edit` (write) |
 
 ---
 
@@ -64,7 +95,7 @@ Wait for all services to be healthy (the script will show progress). Then start 
 ## Running TaskManager
 
 ```bash
-cd demo/taskmanager
+cd examples/taskmanager
 
 # Run without Kessel (tasks managed locally, Kessel calls logged as errors)
 go run .
@@ -159,8 +190,6 @@ curl -s -X DELETE http://localhost:8080/tasks/{id}
 
 ## Demo flow
 
-This service is meant to be used with the Kessel onboarding skills:
-
 ```
 1. Run the service (go run .)
 2. /kessel-onboarding:interview  — captures TaskManager's onboarding profile
@@ -169,4 +198,3 @@ This service is meant to be used with the Kessel onboarding skills:
 5. With Kessel running: create and delete tasks, watch them appear in inventory
 ```
 
-See [taskmanager-overview.md](../taskmanager-overview.md) for the one-pager describing the service.
