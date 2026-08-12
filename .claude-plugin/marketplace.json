@@ -8,8 +8,7 @@
     {
       "name": "kessel-onboarding",
       "source": ".",
-      "version": "1.0.0",
-      "description": "AI-powered Kessel service onboarding including structured intake interview, Jira provisioning, resource and permissions schema design, and interview accuracy validation."
+      "version": "1.0.0"
     }
   ]
 }
