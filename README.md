@@ -2,26 +2,29 @@
 
 AI agents and skills for the Kessel service onboarding program. Jira remains the system of record; agents propose artifacts and humans approve writes.
 
-## Loading this plugin
+## Installing this plugin
 
-### Claude Code (CLI or desktop app)
+### Via the marketplace (recommended)
 
-**Session-only (recommended for testing):**
+The plugin is hosted as a Claude Code marketplace on GitHub. Install it permanently in one step:
+
 ```bash
-claude --plugin-dir /path/to/kessel-onboarding-agents
+# 1. Register the Kessel marketplace (one-time)
+/plugin marketplace add project-kessel/kessel-onboarding-agents
+
+# 2. Install the plugin from that marketplace
+/plugin install kessel-onboarding@kessel-onboarding-agents
 ```
-The `--plugin-dir` flag can be repeated to load multiple plugins simultaneously. Skills and slash commands are available for that session only — nothing is written to your global config.
 
-**Persistent (installed for all sessions):**
+Once installed, all slash commands are available in every Claude Code session without any flags.
 
-Claude Code also supports installing plugins permanently via the `/install-plugin` command or the settings UI. For a local repo, point it at the directory. For a shared team plugin, the repo can be packaged as a `.zip` or hosted at a URL:
+### Claude Code (CLI or desktop app) — local or session-only
 
 ```bash
-# Load from a URL for this session
-claude --plugin-url https://example.com/kessel-onboarding-agents.zip
+# Session-only — available for this session only, nothing written to global config
+claude --plugin-dir /path/to/kessel-onboarding-agents
 
-# Or install permanently via the CLI
-claude  # then inside the session:
+# Persistent local install — inside a Claude Code session
 /install-plugin /path/to/kessel-onboarding-agents
 ```
 

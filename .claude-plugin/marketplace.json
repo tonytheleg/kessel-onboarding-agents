@@ -1,0 +1,14 @@
+{
+  "name": "kessel-onboarding-agents",
+  "description": "Kessel service onboarding skills — structured intake interview, Jira provisioning, schema design, and validation",
+  "owner": {
+    "name": "Kessel"
+  },
+  "plugins": [
+    {
+      "name": "kessel-onboarding",
+      "source": ".",
+      "version": "1.0.0"
+    }
+  ]
+}
