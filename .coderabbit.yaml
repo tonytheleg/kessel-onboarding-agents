@@ -41,6 +41,13 @@ reviews:
         Skill definition files. Focus on skill design and operational
         correctness — NOT on Kessel technical integration details.
 
+        Version bump:
+        - Any change to this path requires a version bump in both
+          .claude-plugin/plugin.json and .claude-plugin/marketplace.json.
+          Flag if those files are not updated in this PR.
+        - Exception: skip if the PR title or description contains
+          "skip-version-bump" or the label "initial-build" is applied.
+
         Gate and human-in-the-loop design:
         - Does every destructive or external-write operation sit behind an
           explicit human gate? Flag any skill that writes to Jira, commits
@@ -80,6 +87,13 @@ reviews:
       instructions: |
         Agent orchestration files. Review for skill sequencing and gate logic.
 
+        Version bump:
+        - Any change to this path requires a version bump in both
+          .claude-plugin/plugin.json and .claude-plugin/marketplace.json.
+          Flag if those files are not updated in this PR.
+        - Exception: skip if the PR title or description contains
+          "skip-version-bump" or the label "initial-build" is applied.
+
         - Does the agent pass all required inputs to each sub-skill,
           including test_mode where applicable?
         - Are skill invocations in the correct order (e.g. suggest-patterns
@@ -96,6 +110,13 @@ reviews:
       instructions: |
         Slash command specification files. Review for completeness and accuracy.
 
+        Version bump:
+        - Any change to this path requires a version bump in both
+          .claude-plugin/plugin.json and .claude-plugin/marketplace.json.
+          Flag if those files are not updated in this PR.
+        - Exception: skip if the PR title or description contains
+          "skip-version-bump" or the label "initial-build" is applied.
+
         - Does the Arguments table list all flags, including recently added
           ones (e.g. --test-mode)?
         - Does the Synopsis section show at least a simple and a complex
@@ -109,7 +130,11 @@ reviews:
     - path: "context/**"
       instructions: |
         Runtime context files loaded by skills. Any change here affects skill
-        behavior and requires a version bump.
+        behavior and requires a version bump in both
+        .claude-plugin/plugin.json and .claude-plugin/marketplace.json.
+        Flag if those files are not updated in this PR.
+        Exception: skip if the PR title or description contains
+        "skip-version-bump" or the label "initial-build" is applied.
 
         - For platform-gates.json: verify status_reviewed_at is updated
           whenever any gate status changes.
@@ -118,6 +143,25 @@ reviews:
           in sync.
         - Flag if migrated_apps.lst changes are not reflected in the
           corresponding KSL files.
+
+    # ── Examples (non-taskmanager) ───────────────────────────────────────────
+    - path: "examples/**"
+      instructions: |
+        Example files (intake notes, profiles, handoffs) used as reference
+        material by skills. Excludes examples/taskmanager/** which has its
+        own Kessel integration instructions.
+
+        Version bump:
+        - Any change to this path requires a version bump in both
+          .claude-plugin/plugin.json and .claude-plugin/marketplace.json.
+          Flag if those files are not updated in this PR.
+        - Exception: skip if the PR title or description contains
+          "skip-version-bump" or the label "initial-build" is applied.
+
+        Content accuracy:
+        - Example profiles and handoffs should reflect the current
+          ServiceProfile schema version. Flag references to removed or
+          renamed fields.
 
     # ── Schema design reference ───────────────────────────────────────────────
     - path: "skills/onboarding-schema-design/reference.md"
