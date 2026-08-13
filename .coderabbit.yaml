@@ -1,0 +1,243 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# See https://docs.coderabbit.ai/reference/configuration
+
+knowledge_base:
+  learnings:
+    scope: global
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "CONTRIBUTING.md"
+      - "AGENTS.md"
+      - "README.md"
+      - "skills/**/SKILL.md"
+      - "skills/**/reference.md"
+
+reviews:
+  path_instructions:
+
+    # ── Plugin versioning ────────────────────────────────────────────────────
+    - path: ".claude-plugin/**"
+      instructions: |
+        Plugin metadata files. Review for versioning correctness:
+        - plugin.json and marketplace.json must have identical version strings.
+          Flag any mismatch as a blocking issue.
+        - Determine whether the version bump type is appropriate per the
+          semantic versioning strategy in CONTRIBUTING.md:
+            Patch: typo/wording fix, broken link, no behavior change
+            Minor: new skill, new command, new flag, behavior change that is
+                   backward-compatible
+            Major: renamed command, broken artifact format, removed skill
+        - Flag if any changes to skills/, agents/, commands/, or context/ are
+          in this PR but no version bump is present in these files.
+        - Exception: if the PR title or description contains the text
+          "skip-version-bump" or the label "initial-build", do not flag
+          missing version bumps. This escape hatch is for active development
+          of the initial 1.0.0 release before the plugin is publicly published.
+
+    # ── Skills ───────────────────────────────────────────────────────────────
+    - path: "skills/**"
+      instructions: |
+        Skill definition files. Focus on skill design and operational
+        correctness — NOT on Kessel technical integration details.
+
+        Version bump:
+        - Any change to this path requires a version bump in both
+          .claude-plugin/plugin.json and .claude-plugin/marketplace.json.
+          Flag if those files are not updated in this PR.
+        - Exception: skip if the PR title or description contains
+          "skip-version-bump" or the label "initial-build" is applied.
+
+        Gate and human-in-the-loop design:
+        - Does every destructive or external-write operation sit behind an
+          explicit human gate? Flag any skill that writes to Jira, commits
+          files, or calls external APIs without a documented approval step.
+        - Are gate options clearly enumerated (what the user types to proceed,
+          revise, or abort)?
+
+        Input/output completeness:
+        - Are all inputs listed in the Inputs table? Flag missing required
+          inputs (especially test_mode if the skill has test mode behavior).
+        - Does the skill document where artifacts are written and whether
+          those paths change in test mode?
+        - Is the Outputs section present and accurate?
+
+        Codebase analysis rules (for skills with Step 1.5 / blindfold logic):
+        - Are the "ignore" and "keep" tables complete and accurate for the
+          blindfold? Flag if a new Kessel-specific signal is not listed.
+        - Does the skill distinguish RBAC v1/v2 service calls (keep) from
+          Kessel SDK calls (ignore)?
+
+        Reference data:
+        - If the skill loads a reference.md, does it actually cite the
+          relevant section it needs for each decision it makes?
+
+        Test mode:
+        - If the skill accepts test_mode, do artifacts route to
+          artifacts/test/{slug}/ rather than artifacts/profiles/?
+        - Is test_mode listed in the Inputs table?
+
+        Changelog:
+        - Is a changelog entry present that describes what changed and why?
+        - Exception: skip this check if the PR title or description contains
+          "skip-version-bump" or the label "initial-build".
+
+    # ── Agents ───────────────────────────────────────────────────────────────
+    - path: "agents/**"
+      instructions: |
+        Agent orchestration files. Review for skill sequencing and gate logic.
+
+        Version bump:
+        - Any change to this path requires a version bump in both
+          .claude-plugin/plugin.json and .claude-plugin/marketplace.json.
+          Flag if those files are not updated in this PR.
+        - Exception: skip if the PR title or description contains
+          "skip-version-bump" or the label "initial-build" is applied.
+
+        - Does the agent pass all required inputs to each sub-skill,
+          including test_mode where applicable?
+        - Are skill invocations in the correct order (e.g. suggest-patterns
+          before dedup, dedup before handoff)?
+        - Does the agent document its Gate 0 / Gate 1 / Gate 2 checkpoints
+          clearly, including what happens at each option?
+        - Are Inputs and Outputs tables present and consistent with what the
+          agent actually passes and produces?
+        - Flag any agent that skips a human gate for operations that create
+          or modify external resources.
+
+    # ── Commands ─────────────────────────────────────────────────────────────
+    - path: "commands/**"
+      instructions: |
+        Slash command specification files. Review for completeness and accuracy.
+
+        Version bump:
+        - Any change to this path requires a version bump in both
+          .claude-plugin/plugin.json and .claude-plugin/marketplace.json.
+          Flag if those files are not updated in this PR.
+        - Exception: skip if the PR title or description contains
+          "skip-version-bump" or the label "initial-build" is applied.
+
+        - Does the Arguments table list all flags, including recently added
+          ones (e.g. --test-mode)?
+        - Does the Synopsis section show at least a simple and a complex
+          example invocation?
+        - Does the Return value section accurately describe what artifacts
+          are produced and where?
+        - Flag if a command references a skill or agent path that does not
+          exist in the repo.
+
+    # ── Context files ─────────────────────────────────────────────────────────
+    - path: "context/**"
+      instructions: |
+        Runtime context files loaded by skills. Any change here affects skill
+        behavior and requires a version bump in both
+        .claude-plugin/plugin.json and .claude-plugin/marketplace.json.
+        Flag if those files are not updated in this PR.
+        Exception: skip if the PR title or description contains
+        "skip-version-bump" or the label "initial-build" is applied.
+
+        - For platform-gates.json: verify status_reviewed_at is updated
+          whenever any gate status changes.
+        - Flag any gate status set to "partial" or "ongoing" for a pattern
+          that is marked "ready" in the compiled schema — these should be
+          in sync.
+        - Flag if migrated_apps.lst changes are not reflected in the
+          corresponding KSL files.
+
+    # ── Examples (non-taskmanager) ───────────────────────────────────────────
+    - path: "examples/**"
+      instructions: |
+        Example files (intake notes, profiles, handoffs) used as reference
+        material by skills. Excludes examples/taskmanager/** which has its
+        own Kessel integration instructions.
+
+        Version bump:
+        - Any change to this path requires a version bump in both
+          .claude-plugin/plugin.json and .claude-plugin/marketplace.json.
+          Flag if those files are not updated in this PR.
+        - Exception: skip if the PR title or description contains
+          "skip-version-bump" or the label "initial-build" is applied.
+
+        Content accuracy:
+        - Example profiles and handoffs should reflect the current
+          ServiceProfile schema version. Flag references to removed or
+          renamed fields.
+
+    # ── Schema design reference ───────────────────────────────────────────────
+    - path: "skills/onboarding-schema-design/reference.md"
+      instructions: |
+        This file is the authoritative format reference loaded by the
+        schema-design skill. Review changes for internal consistency and
+        technical accuracy — flag issues for human review rather than
+        auto-approving if uncertain.
+
+        KSL syntax:
+        - Any new KSL example must use real extensions from rbac.ksl:
+          add_v1_based_permission, add_unified_permission, add_v1only_permission,
+          add_contingent_permission. Flag fictional extensions (e.g. add_permission
+          without a v2_perm parameter — this is a tutorial simplification, not
+          real KSL).
+        - Cardinality keywords must be one of: Any, AtMostOne, ExactlyOne,
+          AtLeastOne. Flag any other cardinality values.
+        - Visibility keywords must be: public, internal, or private only.
+
+        Naming conventions:
+        - v2 permission names must follow {app}_{resource_singular}_{action}
+          all lowercase. Flag any example using "read" or "write" as the action
+          (correct forms are "view", "edit", "delete", "move", "new", etc.).
+        - Resource type names must be lowercase singular nouns in snake_case.
+          Flag plural forms (hosts, tasks) or camelCase.
+        - Namespace must be lowercase with underscores — never hyphens.
+
+        Pattern classification table:
+        - The pattern → KSL type definition mapping must stay consistent:
+          native and native-ws-list require public type; default-workspace
+          also requires public type (when inventory_migration_required is true).
+          root-workspace and org-level do not require a public type. Flag any
+          change that contradicts this.
+
+        workspace_id:
+        - Any claim about workspace_id behavior must be consistent with the
+          documented mechanism: it triggers automatic authorization graph tuple
+          creation. Flag any description that says workspace_id is optional for
+          access-controlled resources or that omitting it is safe.
+
+        Cross-references:
+        - If a section references a pattern or concept defined elsewhere in the
+          file (e.g. "see KSL PR review checklist"), verify the referenced
+          section still exists and has the matching content after the change.
+
+    # ── Taskmanager demo (Kessel integration) ────────────────────────────────
+    - path: "examples/taskmanager/**"
+      instructions: |
+        Demo Go service that integrates with Kessel Inventory API. Apply
+        Kessel integration review rules:
+
+        API and client:
+        - Must use v1beta2 API. Flag any v1beta1 references.
+        - Use the SDK ClientBuilder pattern. Do not construct gRPC channels
+          manually or create a new client per request.
+        - insecure() is acceptable here for local demo use only. Flag if it
+          appears in any path that would run in staging or prod.
+
+        Authorization:
+        - Use Check for read operations, CheckForUpdate for write operations.
+        - Fail closed when Kessel is unavailable — deny access and log.
+          Do not silently allow requests if the Kessel call fails.
+
+        Resource reporting:
+        - ReportResource must be called after the DB/store write, not before.
+        - workspace_id must be included in the common representation.
+        - DeleteResource must be called after the resource is removed locally.
+        - Log Kessel errors but do not block the user's request on them.
+
+        Credentials:
+        - Credentials must come from environment variables, not hardcoded.
+        - Do not relay x-rh-identity for workspace lookups — use the service
+          OAuth token with x-rh-rbac-org-id.
+
+        rbac.go (intentional stub):
+        - This file is a non-functional stub for demo purposes only.
+          Do not flag it as dead code or suggest wiring it into request
+          handlers. Its sole purpose is to provide RBAC v1 permission
+          signals for the onboarding interview skill during demos.

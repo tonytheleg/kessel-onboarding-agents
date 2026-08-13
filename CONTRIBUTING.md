@@ -128,6 +128,15 @@ Include the version bump in the same PR as the skill changes. Do not open a sepa
 
 There is no manual publish step; the GitHub repo IS the plugin distribution channel.
 
+### Bypassing version checks during active development
+
+CodeRabbit will flag missing version bumps on PRs that touch plugin files. To suppress this during active development (e.g. while building toward an initial release or to submit multiple small PRs to then release on a final PR), add one of the following to your PR:
+
+- Include the text `skip-version-bump` anywhere in the PR title or description
+- Apply the GitHub label `initial-build` to the PR
+
+Remove these once the plugin is published and versioning discipline should be enforced on every PR.
+
 ---
 
 ## Adding new skills
