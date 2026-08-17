@@ -23,14 +23,14 @@ Resource types are auto-discovered at startup by scanning this directory tree. N
 |---|---|---|
 | Resource type directory | `snake_case` lowercase | `host`, `k8s_cluster`, `notifications_integration` |
 | Resource type value in config.yaml | `snake_case` or slash-separated | `host`, `notifications/integration` |
-| `resource_reporters` list entries | **UPPERCASE** | `HBI`, `TASKMANAGER`, `NOTIFICATIONS` |
+| `resource_reporters` list entries | lowercase (any case accepted; inventory-api normalizes internally) | `hbi`, `taskmanager`, `notifications` |
 | Reporter directory name | lowercase | `hbi`, `taskmanager`, `notifications` |
 | `reporter_name` field in reporter config.yaml | lowercase | `hbi`, `taskmanager` |
 | `namespace` field in reporter config.yaml | lowercase (matches `reporter_name`) | `hbi`, `taskmanager` |
 | Reporter JSON file | `{resource_type_directory}.json` | `host.json`, `k8s_cluster.json` |
-| `reporter_type` in gRPC calls | UPPERCASE | `"HBI"`, `"TASKMANAGER"` |
+| `reporter_type` in gRPC calls | any case — normalized to lowercase by inventory-api | `"hbi"`, `"TASKMANAGER"` both valid |
 
-**Reporter casing duality:** the same reporter is written UPPERCASE in `resource_reporters` and gRPC `reporter_type`, and lowercase in the filesystem directory, `reporter_name` field, and `namespace` field. The values are case-insensitively matched at registration. Example: `resource_reporters: [TASKMANAGER]` ↔ `reporters/taskmanager/` ↔ `reporter_name: taskmanager`.
+**Reporter casing:** There is no hard requirement for uppercase. Inventory-api normalizes `reporter_type` to lowercase internally before registration (SpiceDB requires lowercase identifiers matching `^([a-z][a-z0-9_]{1,61}[a-z0-9]/)*[a-z][a-z0-9_]{1,62}[a-z0-9]$`). Use lowercase consistently to avoid confusion. Example: `resource_reporters: [hbi]` ↔ `reporters/hbi/` ↔ `reporter_name: hbi`.
 
 Slash-separated type names (`notifications/integration`) are normalized to underscores for directory names (`notifications_integration`) and lowercased during registration.
 
@@ -43,7 +43,7 @@ resource_reporters:
   - {reporter_name_2}
 ```
 
-Reporter names use **UPPERCASE** — see naming conventions table above for the full casing duality.
+Reporter names are case-insensitive — inventory-api normalizes them to lowercase. See naming conventions table above.
 
 ### common_representation.json
 
@@ -638,7 +638,7 @@ Omitting visibility defaults to `public`. Use `private` for workspace relations 
 | Intersection | `a and b` | Both must be satisfied simultaneously |
 | Exclusion | `a unless b` | a, minus anything also matching b |
 
-**Arrow direction rule:** always `relation→permission`, never `relation→relation`. The right-hand side of traversal arrows must reference a **permission** (not a raw relation) on the target type. This decouples the caller from internal structural changes in the target.
+**Arrow direction note (SpiceDB, not KSL):** In KSL, any member can reference any other member — relations and permissions are not distinguished at the KSL level (KSL wraps relations in permissions implicitly during compilation). The `relation→permission` preference is a SpiceDB schema best practice for decoupling callers from internal structure, but KSL does not enforce it.
 
 ### Cardinality keywords
 
@@ -755,9 +755,9 @@ if Check(read_grant) && Check(subscription_active) { ... }
 
 Application-side logic is invisible to schema audits and creates drift.
 
-### Use permissions for traversal, not relations
+### Use permissions for traversal, not relations (SpiceDB best practice)
 
-Call `Check` against **permissions**, not raw relations. If the schema's internal structure changes, updating a permission definition requires no data migration; changing a relation definition does.
+When calling `Check` directly against the SpiceDB API, prefer targeting **permissions** rather than raw relations. This is a SpiceDB schema best practice — not a KSL constraint. KSL does not distinguish between relations and permissions at the language level.
 
 ### Additive / positive phrasing
 
@@ -794,9 +794,10 @@ If the result is **allowed**, the relationship would create a cycle — abort. I
 | Relation | Static structural authorization (role, membership, parent, workspace) |
 | Permission | Computed capability derived from relations — use for all authorization checks |
 | Caveat | Dynamic contextual gate that relations cannot express (time of day, IP) — avoid where possible |
-| Native expiration | Time-bound access — more efficient than caveats |
 
 Prefer relations over caveats. Caveats are harder to cache and slow traversal.
+
+Note: SpiceDB supports native expiration for time-bound permissions, but this is not currently supported in KSL or the Kessel unified schema.
 
 ---
 
