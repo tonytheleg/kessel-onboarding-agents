@@ -8,13 +8,23 @@ description: >
 
 # Onboarding preflight
 
-Run before the first `/kessel-onboarding:interview` or `/kessel-onboarding:provision` on a machine, and after any change to `~/.config/kessel-onboarding/config.json`. Produces a PASS/FAIL summary so config and access problems surface before a live session, not mid-interview or mid-provision.
+Validates configuration and access before a live session. Produces a PASS/FAIL summary so problems surface before mid-interview or mid-provision.
 
-## When to use
+## When preflight is required
 
-- Before the first `/kessel-onboarding:interview` or `/kessel-onboarding:provision` run on a new machine.
-- After any change to `~/.config/kessel-onboarding/config.json` or the `.env` REST fallback credentials.
-- Whenever an interview or provision session fails with a config, MCP, or Jira access error and you need to isolate the cause.
+**Preflight is only required before live Jira provisioning.** The interview and schema-design skills work without it — they are entirely local and do not call Jira.
+
+| Workflow | Preflight needed? |
+|---|---|
+| Interview only (local artifacts) | No |
+| Schema design | No |
+| Provision `--dry-run` (table only, no writes) | No |
+| Live provision (creates Jira issues) | **Yes — run preflight first** |
+
+Run preflight when:
+- Setting up live provisioning on a new machine for the first time.
+- After changing `~/.config/kessel-onboarding/config.json` or `.env` REST credentials.
+- Troubleshooting a failed provision session.
 
 ## Checks
 

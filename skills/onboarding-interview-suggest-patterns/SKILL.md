@@ -48,6 +48,13 @@ Apply the KSL-016 decision tree from [patterns.md](patterns.md#decision-heuristi
 - Is the operation org-wide AND NOT asset-centric (meta-authorization, authentication policy)? → `org-level`
   - Rare for Insights services; flag if suggested
 
+**When asking the EM about cardinality or access probability**, provide context so they can answer without prior Kessel knowledge:
+
+> "For the `{asset_type}` resources in your service: roughly how many records does a typical LIST query return for a single org? (Hundreds? Thousands? Millions?) And of those results, what fraction does the requesting user typically have access to — most of them, or a small subset?"
+>
+> These answers determine whether Kessel should pre-filter by workspace before your database query (`native-ws-list`, better for large result sets) or check each resource individually (`native`, better for small sets).
+> See: https://project-kessel.github.io/docs/building-with-kessel/how-to/migrate-from-rbac-v1-to-v2/
+
 Document rationale per pattern in the `rationale` field. If cardinality or access-probability for `native` / `native-ws-list` is unknown, default to `medium` confidence and ask the EM.
 
 ### Step 3 — Assign confidence
