@@ -31,7 +31,7 @@ Run preflight when:
 
 | # | Check | How | Remediation on fail |
 |---|-------|-----|----------------------|
-| 1 | Config file exists with required keys (`jira_cloud_id`, `initiative_project`, `onboarding_project`, `onboarding_label`, `mcp_server_name`, `team_field_id`, `team_field_value`, `artifacts_dir`) | Read `~/.config/kessel-onboarding/config.json` | Point to `docs/configuration.md` template |
+| 1 | Config file exists with required keys (`jira_cloud_id`, `initiative_project`, `onboarding_project`, `onboarding_label`, `mcp_server_name`, `team_field_id`, `team_field_value`, `artifacts_dir`) — all `YOUR_*` placeholder values must be replaced | Read `~/.config/kessel-onboarding/config.json` | Point to `docs/configuration.md` template |
 | 2 | Atlassian MCP connected and authenticated | Call the accessible-resources tool; confirm `jira_cloud_id` appears | Instructions: authenticate the Atlassian MCP connector; re-run |
 | 3 | Jira read access | Run one JQL search: `project = {onboarding_project} ORDER BY created DESC` max 1 result | Request RHCLOUD read access; link to config doc |
 | 4 | Jira create permission (Provisioner only) | Call `GET /rest/api/3/mypermissions?projectKey={onboarding_project}&permissions=CREATE_ISSUES` via REST fallback. Never create a test issue. | Request create permission in RHCLOUD/CRCPLAN |

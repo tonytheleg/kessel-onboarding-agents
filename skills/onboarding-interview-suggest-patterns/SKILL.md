@@ -62,12 +62,14 @@ Decision rules:
 - Workspace-aware + **fewer than 10,000 results** OR **more than 80% accessible** → `native` (per-resource Check)
 - Workspace-aware + **more than 10,000 results** AND **fewer than 80% accessible** → `native-ws-list` (workspace pre-filter + DB query)
 
-**When asking the EM**, frame it without Kessel jargon:
+**When asking the EM**, frame it without Kessel jargon and anchor the question to the 10,000 threshold so qualitative answers map cleanly:
 
-> "For the `{asset_type}` resources in your service: roughly how many records does a typical LIST query return for a single org — hundreds, thousands, or millions? And of those results, what fraction does the requesting user typically have access to — most of them, or a small subset?"
+> "For the `{asset_type}` resources in your service: does a typical LIST query for a single org return fewer than ten thousand records, or more? And of those results, does the requesting user typically have access to most of them (more than 80%), or just a small fraction?"
 >
-> Fewer than ~10,000 results, or users can typically see most of them → use `native` (Kessel checks each resource individually).
-> More than ~10,000 results AND users only see a small fraction → use `native-ws-list` (Kessel pre-filters by workspace before your DB query, which scales better at high volume).
+> - Fewer than 10,000 results, or most results are accessible → `native`
+> - More than 10,000 results AND only a small fraction are accessible → `native-ws-list`
+>
+> If the EM gives a qualitative answer like "thousands" without committing to above or below 10,000, follow up: "Would you say it's closer to a few thousand — say under ten thousand — or potentially tens of thousands or more?" Record `medium` confidence if still uncertain.
 > See: https://project-kessel.github.io/docs/building-with-kessel/how-to/migrate-from-rbac-v1-to-v2/
 
 Document rationale per pattern in the `rationale` field. If either cardinality or access-probability is unknown, default to `medium` confidence and note what needs confirming with the EM before Phase 2.

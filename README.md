@@ -89,18 +89,21 @@ The interview and schema-design skills work without any Jira configuration. To e
    {
      "jira_host": "redhat.atlassian.net",
      "jira_cloud_id": "YOUR_CLOUD_ID",
-     "initiative_project": "CRCPLAN",
-     "onboarding_project": "RHCLOUD",
-     "allowed_projects": ["CRCPLAN", "RHCLOUD"],
+     "initiative_project": "YOUR_INITIATIVE_PROJECT",
+     "onboarding_project": "YOUR_ONBOARDING_PROJECT",
      "onboarding_label": "kessel-onboarding",
      "platform_gates_path": "context/platform-gates.json",
      "artifacts_dir": "./artifacts",
      "mcp_server_name": "YOUR_ATLASSIAN_MCP_SERVER_NAME",
-     "team_field_id": "customfield_10001",
-     "team_field_value": "0565e73b-8086-4228-9d8e-58a35ae78984"
+     "team_field_id": "YOUR_TEAM_FIELD_ID",
+     "team_field_value": "YOUR_TEAM_UUID"
    }
    ```
-   See [docs/configuration.md](docs/configuration.md) for field descriptions and how to find your `jira_cloud_id`.
+   - `initiative_project` — the Jira project where Provider Initiatives are created (e.g. your team's feature/initiative tracking project)
+   - `onboarding_project` — the Jira project where Service Epics and Phase Stories are created (e.g. your team's sprint/work-item project)
+   - `team_field_value` — the UUID of your team's entry in the Jira "Team" field (not the display name).
+
+   See [docs/configuration.md](docs/configuration.md) for all field descriptions, how to find your `jira_cloud_id`, and how to look up your team UUID.
 2. Create a `.env` file with your Atlassian API credentials (see [docs/configuration.md](docs/configuration.md) for the REST fallback setup).
 3. Run `/kessel-onboarding:preflight --provisioner` to validate all checks required for live provisioning.
 
