@@ -8,17 +8,17 @@ AI agents and skills for the Kessel service onboarding program. Jira remains the
 
 1. Install the plugin (see [Installing this plugin](#installing-this-plugin) below).
 2. Run an intake session:
-   ```
+   ```text
    /kessel-onboarding:interview --provider "Subscription Management" --service "Activation Keys"
    ```
 3. Review the generated ServiceProfile and handoff in `./artifacts/profiles/`.
 4. Optionally design schemas:
-   ```
+   ```bash
    /kessel-onboarding:schema-design --profile artifacts/profiles/{slug}-profile.json \
      --codebase_ref ~/dev/my-service
    ```
 5. To preview what would be created in Jira (no writes):
-   ```
+   ```text
    /kessel-onboarding:provision --handoff artifacts/profiles/{slug}-handoff.md --dry-run
    ```
 
@@ -84,9 +84,19 @@ The `--plugin-dir` flag is Claude Code CLI only — Cursor does not support it.
 
 The interview and schema-design skills work without any Jira configuration. To enable live Jira provisioning (`/kessel-onboarding:provision` without `--dry-run`):
 
-1. Copy [docs/configuration.md](docs/configuration.md) to `~/.config/kessel-onboarding/config.json` and fill in your Jira cloud ID and allowed projects.
+1. Copy [docs/configuration.md](docs/configuration.md) to `~/.config/kessel-onboarding/config.json`. Required keys:
+   - `jira_cloud_id` — Atlassian cloud ID
+   - `initiative_project` — Jira project for Provider Initiatives (e.g. `CRCPLAN`)
+   - `onboarding_project` — Jira project for Epics and Stories (e.g. `RHCLOUD`)
+   - `onboarding_label` — label applied to all created issues (e.g. `kessel-onboarding`)
+   - `mcp_server_name` — name of your connected Atlassian MCP server
+   - `team_field_id` — Jira custom field ID for the Team field
+   - `team_field_value` — UUID for the Console - Kessel team
+   - `artifacts_dir` — local directory for generated profiles and handoffs
+
+   See [docs/configuration.md](docs/configuration.md) for the full template and field descriptions.
 2. Create a `.env` file with your Atlassian API credentials (see [docs/configuration.md](docs/configuration.md) for the REST fallback setup).
-3. Run `/kessel-onboarding:preflight` to validate config, MCP connectivity, Jira access, and JQL templates.
+3. Run `/kessel-onboarding:preflight --provisioner` to validate all checks required for live provisioning.
 
 ---
 

@@ -1,14 +1,14 @@
 ---
 name: onboarding-preflight
 description: >
-  Validates config, MCP connectivity, Jira access, REST fallback credentials,
-  and JQL templates before running interview or provision. Run once per
-  machine and after any config change.
+  Gate check before live Jira provisioning. Validates config, MCP connectivity,
+  Jira read/create access, REST fallback credentials, and JQL templates.
+  Not required for interview, schema-design, or dry-run workflows.
 ---
 
 # Onboarding preflight
 
-Validates configuration and access before a live session. Produces a PASS/FAIL summary so problems surface before mid-interview or mid-provision.
+Gate check before live Jira provisioning. Produces a PASS/FAIL summary so config and access problems surface before a provision session, not mid-run.
 
 ## When preflight is required
 
@@ -38,11 +38,19 @@ Run preflight when:
 | 6 | JQL template lint | Substitute sample values into every JQL template in `skills/onboarding-dedup-epic/SKILL.md` and the first-in-pattern query; run each with max 1 result; any syntax error = FAIL | Report the failing template verbatim |
 | 7 | Artifacts dir writable | Create and delete a temp file in `{artifacts_dir}/profiles/` | Fix path or permissions |
 
+## Inputs
+
+| Input | Required | Notes |
+|---|---|---|
+| `--provisioner` | no | When set, run all 7 checks including create-permission (4) and REST credentials (5). Without this flag, run only checks 1–3, 6–7. |
+
 ## Execution
 
-Run checks 1–7 in order. For each check, produce a row: `#`, check name, PASS/FAIL, remediation (only when FAIL).
+Run checks in order based on the input flag. For each check, produce a row: `#`, check name, PASS/FAIL, remediation (only when FAIL).
 
-Output a summary table. Overall PASS requires checks 1–3 and 6–7 for the Interview Agent, all seven for the Provisioner.
+Output a summary table. Overall PASS:
+- Without `--provisioner`: checks 1–3 and 6–7 must pass
+- With `--provisioner`: all seven checks must pass
 
 ## Notes
 
@@ -54,3 +62,7 @@ Output a summary table. Overall PASS requires checks 1–3 and 6–7 for the Int
 
 - Summary table (console) with overall PASS/FAIL
 - Per-check remediation guidance for any FAIL
+
+## Changelog
+
+- 2026-08: Clarified that preflight is a gate before live Jira provisioning only — interview, schema-design, and `provision --dry-run` workflows are entirely local and do not require it. Added `--provisioner` input flag to select the full 7-check mode (including create-permission and REST credential checks); without the flag only checks 1–3 and 6–7 run. Updated description and scope accordingly.

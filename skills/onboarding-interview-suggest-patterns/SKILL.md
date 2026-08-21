@@ -48,14 +48,24 @@ Apply the KSL-016 decision tree from [patterns.md](patterns.md#decision-heuristi
 - Is the operation org-wide AND NOT asset-centric (meta-authorization, authentication policy)? → `org-level`
   - Rare for Insights services; flag if suggested
 
-**When asking the EM about cardinality or access probability**, provide context so they can answer without prior Kessel knowledge:
+**Choosing between `native` and `native-ws-list`** requires three inputs:
+1. **Workspace-awareness** — is the resource already organized by workspaces/groups in the service's data model? (Required for both native patterns.)
+2. **Result cardinality** — how many records does a typical org-scoped LIST return?
+3. **Access probability** — of those results, what fraction does a requesting user typically have access to?
 
-> "For the `{asset_type}` resources in your service: roughly how many records does a typical LIST query return for a single org? (Hundreds? Thousands? Millions?) And of those results, what fraction does the requesting user typically have access to — most of them, or a small subset?"
+Decision rules:
+- Workspace-aware + **fewer than 10,000 results** OR **more than 80% accessible** → `native` (per-resource Check)
+- Workspace-aware + **more than 10,000 results** AND **fewer than 80% accessible** → `native-ws-list` (workspace pre-filter + DB query)
+
+**When asking the EM**, frame it without Kessel jargon:
+
+> "For the `{asset_type}` resources in your service: roughly how many records does a typical LIST query return for a single org — hundreds, thousands, or millions? And of those results, what fraction does the requesting user typically have access to — most of them, or a small subset?"
 >
-> These answers determine whether Kessel should pre-filter by workspace before your database query (`native-ws-list`, better for large result sets) or check each resource individually (`native`, better for small sets).
+> Fewer than ~10,000 results, or users can typically see most of them → use `native` (Kessel checks each resource individually).
+> More than ~10,000 results AND users only see a small fraction → use `native-ws-list` (Kessel pre-filters by workspace before your DB query, which scales better at high volume).
 > See: https://project-kessel.github.io/docs/building-with-kessel/how-to/migrate-from-rbac-v1-to-v2/
 
-Document rationale per pattern in the `rationale` field. If cardinality or access-probability for `native` / `native-ws-list` is unknown, default to `medium` confidence and ask the EM.
+Document rationale per pattern in the `rationale` field. If either cardinality or access-probability is unknown, default to `medium` confidence and note what needs confirming with the EM before Phase 2.
 
 ### Step 3 — Assign confidence
 
@@ -129,6 +139,7 @@ Updated ServiceProfile with `patterns[]`, `platform_gates[]`, and possibly `prog
 
 ## Changelog
 
+- 2026-08: Added structured native vs native-ws-list decision guidance with explicit cardinality (<10k) and access-probability (>80%) thresholds; added EM-facing question framing explaining workspace pre-filtering vs per-resource checks without Kessel jargon.
 - 2026-07: Fixed Step 5 to also map the UI platform gate when `ui_access_checks` is `new`, not just `required` — both trigger a conditional UI story and need the same gate tracking.
 - 2026-07: Added `asset_types[]` to each pattern object so multi-pattern services map every asset type to exactly one pattern instead of leaving the split implicit in rationale text.
 - 2026-07: Replaced the first-in-pattern JQL with an exact-match `kessel-pattern:{id}` label query; read the UI gate from `gates.ui-platform` instead of the removed top-level `ui_gate`.
