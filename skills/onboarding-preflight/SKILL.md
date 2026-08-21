@@ -2,8 +2,9 @@
 name: onboarding-preflight
 description: >
   Gate check before live Jira provisioning. Validates config, MCP connectivity,
-  Jira read/create access, REST fallback credentials, and JQL templates.
-  Not required for interview, schema-design, or dry-run workflows.
+  Jira read access, and JQL templates. When --provisioner is supplied, also
+  validates Jira create-access and REST fallback credentials. Not required for
+  interview, schema-design, or dry-run workflows.
 ---
 
 # Onboarding preflight

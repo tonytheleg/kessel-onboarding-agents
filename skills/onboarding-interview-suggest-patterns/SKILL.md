@@ -16,13 +16,18 @@ description: >
 
 ## Inputs
 
-| Input | Required |
-|-------|----------|
-| ServiceProfile JSON path or object | yes |
-| `asset_types` | from profile |
-| `v1_permissions` | from profile |
-| `inventory_reporting` | from profile |
-| `program.wave` | from profile |
+| Input | Required | Source |
+|-------|----------|--------|
+| ServiceProfile JSON path or object | yes | — |
+| `asset_types` | yes | from profile |
+| `v1_permissions` | yes | from profile |
+| `inventory_reporting` | yes | from profile |
+| `program.wave` | yes | from profile |
+| workspace-awareness per asset type | yes for native/native-ws-list | collected from EM in Step 2 |
+| result cardinality per asset type | yes for native/native-ws-list | collected from EM in Step 2 (approximate: hundreds / thousands / millions) |
+| access probability per asset type | yes for native/native-ws-list | collected from EM in Step 2 (approximate: most results accessible, or small fraction) |
+
+Workspace-awareness, cardinality, and access-probability are not stored on the profile — they are elicited from the EM during Step 2 analysis when the asset type appears to qualify for a native pattern. If either cardinality or access-probability is unknown, assign `medium` confidence and record what needs confirming.
 
 ## Execution
 

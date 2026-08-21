@@ -84,17 +84,23 @@ The `--plugin-dir` flag is Claude Code CLI only — Cursor does not support it.
 
 The interview and schema-design skills work without any Jira configuration. To enable live Jira provisioning (`/kessel-onboarding:provision` without `--dry-run`):
 
-1. Copy [docs/configuration.md](docs/configuration.md) to `~/.config/kessel-onboarding/config.json`. Required keys:
-   - `jira_cloud_id` — Atlassian cloud ID
-   - `initiative_project` — Jira project for Provider Initiatives (e.g. `CRCPLAN`)
-   - `onboarding_project` — Jira project for Epics and Stories (e.g. `RHCLOUD`)
-   - `onboarding_label` — label applied to all created issues (e.g. `kessel-onboarding`)
-   - `mcp_server_name` — name of your connected Atlassian MCP server
-   - `team_field_id` — Jira custom field ID for the Team field
-   - `team_field_value` — UUID for the Console - Kessel team
-   - `artifacts_dir` — local directory for generated profiles and handoffs
-
-   See [docs/configuration.md](docs/configuration.md) for the full template and field descriptions.
+1. Create `~/.config/kessel-onboarding/config.json` with the following required keys:
+   ```json
+   {
+     "jira_host": "redhat.atlassian.net",
+     "jira_cloud_id": "YOUR_CLOUD_ID",
+     "initiative_project": "CRCPLAN",
+     "onboarding_project": "RHCLOUD",
+     "allowed_projects": ["CRCPLAN", "RHCLOUD"],
+     "onboarding_label": "kessel-onboarding",
+     "platform_gates_path": "context/platform-gates.json",
+     "artifacts_dir": "./artifacts",
+     "mcp_server_name": "YOUR_ATLASSIAN_MCP_SERVER_NAME",
+     "team_field_id": "customfield_10001",
+     "team_field_value": "0565e73b-8086-4228-9d8e-58a35ae78984"
+   }
+   ```
+   See [docs/configuration.md](docs/configuration.md) for field descriptions and how to find your `jira_cloud_id`.
 2. Create a `.env` file with your Atlassian API credentials (see [docs/configuration.md](docs/configuration.md) for the REST fallback setup).
 3. Run `/kessel-onboarding:preflight --provisioner` to validate all checks required for live provisioning.
 
