@@ -16,13 +16,18 @@ description: >
 
 ## Inputs
 
-| Input | Required |
-|-------|----------|
-| ServiceProfile JSON path or object | yes |
-| `asset_types` | from profile |
-| `v1_permissions` | from profile |
-| `inventory_reporting` | from profile |
-| `program.wave` | from profile |
+| Input | Required | Source |
+|-------|----------|--------|
+| ServiceProfile JSON path or object | yes | — |
+| `asset_types` | yes | from profile |
+| `v1_permissions` | yes | from profile |
+| `inventory_reporting` | yes | from profile |
+| `program.wave` | yes | from profile |
+| workspace-awareness per asset type | yes for native/native-ws-list | collected from EM in Step 2 |
+| result cardinality per asset type | yes for native/native-ws-list | collected from EM in Step 2 (approximate: hundreds / thousands / millions) |
+| access probability per asset type | yes for native/native-ws-list | collected from EM in Step 2 (approximate: most results accessible, or small fraction) |
+
+Workspace-awareness, cardinality, and access-probability are not stored on the profile — they are elicited from the EM during Step 2 analysis when the asset type appears to qualify for a native pattern. If either cardinality or access-probability is unknown, assign `medium` confidence and record what needs confirming.
 
 ## Execution
 
@@ -48,7 +53,26 @@ Apply the KSL-016 decision tree from [patterns.md](patterns.md#decision-heuristi
 - Is the operation org-wide AND NOT asset-centric (meta-authorization, authentication policy)? → `org-level`
   - Rare for Insights services; flag if suggested
 
-Document rationale per pattern in the `rationale` field. If cardinality or access-probability for `native` / `native-ws-list` is unknown, default to `medium` confidence and ask the EM.
+**Choosing between `native` and `native-ws-list`** requires three inputs:
+1. **Workspace-awareness** — is the resource already organized by workspaces/groups in the service's data model? (Required for both native patterns.)
+2. **Result cardinality** — how many records does a typical org-scoped LIST return?
+3. **Access probability** — of those results, what fraction does a requesting user typically have access to?
+
+Decision rules:
+- Workspace-aware + **fewer than 10,000 results** OR **more than 80% accessible** → `native` (per-resource Check)
+- Workspace-aware + **more than 10,000 results** AND **fewer than 80% accessible** → `native-ws-list` (workspace pre-filter + DB query)
+
+**When asking the EM**, frame it without Kessel jargon and anchor the question to the 10,000 threshold so qualitative answers map cleanly:
+
+> "For the `{asset_type}` resources in your service: does a typical LIST query for a single org return fewer than ten thousand records, or more? And of those results, does the requesting user typically have access to most of them (more than 80%), or just a small fraction?"
+>
+> - Fewer than 10,000 results, or most results are accessible → `native`
+> - More than 10,000 results AND only a small fraction are accessible → `native-ws-list`
+>
+> If the EM gives a qualitative answer like "thousands" without committing to above or below 10,000, follow up: "Would you say it's closer to a few thousand — say under ten thousand — or potentially tens of thousands or more?" Record `medium` confidence if still uncertain.
+> See: https://project-kessel.github.io/docs/building-with-kessel/how-to/migrate-from-rbac-v1-to-v2/
+
+Document rationale per pattern in the `rationale` field. If either cardinality or access-probability is unknown, default to `medium` confidence and note what needs confirming with the EM before Phase 2.
 
 ### Step 3 — Assign confidence
 
@@ -122,6 +146,7 @@ Updated ServiceProfile with `patterns[]`, `platform_gates[]`, and possibly `prog
 
 ## Changelog
 
+- 2026-08: Added structured native vs native-ws-list decision guidance with explicit cardinality (<10k) and access-probability (>80%) thresholds; added EM-facing question framing explaining workspace pre-filtering vs per-resource checks without Kessel jargon.
 - 2026-07: Fixed Step 5 to also map the UI platform gate when `ui_access_checks` is `new`, not just `required` — both trigger a conditional UI story and need the same gate tracking.
 - 2026-07: Added `asset_types[]` to each pattern object so multi-pattern services map every asset type to exactly one pattern instead of leaving the split implicit in rationale text.
 - 2026-07: Replaced the first-in-pattern JQL with an exact-match `kessel-pattern:{id}` label query; read the UI gate from `gates.ui-platform` instead of the removed top-level `ui_gate`.

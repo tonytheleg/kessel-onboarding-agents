@@ -2,6 +2,30 @@
 
 AI agents and skills for the Kessel service onboarding program. Jira remains the system of record; agents propose artifacts and humans approve writes.
 
+## Quick start
+
+> **New here?** Start with the interview. Jira access is only needed if you plan to provision issues — the interview and schema design skills work without it.
+
+1. Install the plugin (see [Installing this plugin](#installing-this-plugin) below).
+2. Run an intake session:
+   ```text
+   /kessel-onboarding:interview --provider "Subscription Management" --service "Activation Keys"
+   ```
+3. Review the generated ServiceProfile and handoff in `./artifacts/profiles/`.
+4. Optionally design schemas:
+   ```bash
+   /kessel-onboarding:schema-design --profile artifacts/profiles/{slug}-profile.json \
+     --codebase_ref ~/dev/my-service
+   ```
+5. To preview what would be created in Jira (no writes):
+   ```text
+   /kessel-onboarding:provision --handoff artifacts/profiles/{slug}-handoff.md --dry-run
+   ```
+
+**Only need steps 2–3?** Skip preflight. It is only required before live Jira provisioning (`provision` without `--dry-run`).
+
+---
+
 ## Installing this plugin
 
 ### Via the marketplace (recommended)
@@ -56,20 +80,32 @@ The `--plugin-dir` flag is Claude Code CLI only — Cursor does not support it.
 
 ---
 
-## Quick start
+## Setting up for Jira provisioning
 
-1. Copy [docs/configuration.md](docs/configuration.md) to `~/.config/kessel-onboarding/config.json` and fill in your Jira cloud ID and allowed projects.
-2. Update [context/platform-gates.json](context/platform-gates.json) if a pattern's platform readiness status changes — this only affects pattern-suggestion confidence and the paired-vs-self-service default for wave 3+ services; it no longer drives any Jira linking.
-3. Run `/kessel-onboarding:preflight` to validate config, MCP connectivity, Jira access, and JQL templates.
-4. Run an intake session:
+The interview and schema-design skills work without any Jira configuration. To enable live Jira provisioning (`/kessel-onboarding:provision` without `--dry-run`):
 
-```
-/kessel-onboarding:interview --provider "Subscription Management" --service "Activation Keys"
-```
+1. Create `~/.config/kessel-onboarding/config.json` with the following required keys:
+   ```json
+   {
+     "jira_host": "redhat.atlassian.net",
+     "jira_cloud_id": "YOUR_CLOUD_ID",
+     "initiative_project": "YOUR_INITIATIVE_PROJECT",
+     "onboarding_project": "YOUR_ONBOARDING_PROJECT",
+     "onboarding_label": "kessel-onboarding",
+     "platform_gates_path": "context/platform-gates.json",
+     "artifacts_dir": "./artifacts",
+     "mcp_server_name": "YOUR_ATLASSIAN_MCP_SERVER_NAME",
+     "team_field_id": "YOUR_TEAM_FIELD_ID",
+     "team_field_value": "YOUR_TEAM_UUID"
+   }
+   ```
+   - `initiative_project` — the Jira project where Provider Initiatives are created (e.g. your team's feature/initiative tracking project)
+   - `onboarding_project` — the Jira project where Service Epics and Phase Stories are created (e.g. your team's sprint/work-item project)
+   - `team_field_value` — the UUID of your team's entry in the Jira "Team" field (not the display name).
 
-5. Review the generated ServiceProfile and handoff in `./artifacts/profiles/`.
-6. Optionally design schemas: `/kessel-onboarding:schema-design --profile artifacts/profiles/{slug}-profile.json --codebase_ref ~/dev/my-service`
-7. Hand off to the Provisioner Agent: `/kessel-onboarding:provision --handoff artifacts/profiles/{slug}-handoff.md`
+   See [docs/configuration.md](docs/configuration.md) for all field descriptions, how to find your `jira_cloud_id`, and how to look up your team UUID.
+2. Create a `.env` file with your Atlassian API credentials (see [docs/configuration.md](docs/configuration.md) for the REST fallback setup).
+3. Run `/kessel-onboarding:preflight --provisioner` to validate all checks required for live provisioning.
 
 ---
 

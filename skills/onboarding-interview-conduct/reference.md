@@ -108,7 +108,7 @@ See [examples/activation-keys-profile.json](../../examples/activation-keys-profi
 | `jira.feature_epic_key` | What is the existing feature epic key to link (relates to)? |
 | `interview.codebase_ref` | Do you have a link to the service's repo (GitHub/GitLab URL), a local path, or an archive I can look at? This lets me draft answers for UI access checks, tech stack, asset types, and v1 permissions for you to confirm rather than dictating from scratch. Optional — skip if nothing to share. |
 | `program.wave` | Kessel onboards services in waves — batches of teams migrating on a rough timeline, not a hard deadline. Which best fits your team? (1) Already integrating — started or finished early phases before this intake existed. (2) Current wave — onboarding now, as part of today's active batch (default if unsure). (3) Future wave — planned, but not yet started. |
-| `contacts` | PM, EM, and tech lead names and emails? |
+| `contacts` | PM, Engineering Manager (EM), and tech lead names and emails? |
 | `kickoff.docs_reviewed` | Has the team reviewed the onboarding checklist and migration guide? |
 | `credentials.cmdb_registered` | Is your application registered in CMDB with a valid Application ID? (Required before CIAM will provision a service account.) |
 | `credentials.service_account_status` | Have you provisioned a Kessel service account through the CIAM process? Answer for both stage and prod. (None / Requested / Stage only / Stage and prod) |
@@ -135,8 +135,8 @@ This question is about **v1 access check API calls in the UI layer**, not about 
 | Field | Question |
 |-------|----------|
 | `tech_stack` | Language, framework, and how the service calls auth today? |
-| `asset_types[]` | What resource / asset types are in scope? |
-| `v1_permissions` | Paste permissions or give rbac-config path |
+| `asset_types[]` | What resource / asset types are in scope? (An asset type is a first-class object your service manages — e.g. "host", "repository", "policy". Think: what would a user CRUD in your service?) See [resources and representations](https://project-kessel.github.io/docs/building-with-kessel/concepts/resources-representations/) for more. |
+| `v1_permissions` | Paste your existing RBAC v1 permissions or give the path to your rbac-config file. These are the `app:resource:verb` strings like `advisor:recommendations:read` — find them in your service's entry under `rbac-config/configs/stage/permissions/`. |
 | `inventory_reporting` | Does your service currently report resources to Kessel inventory? |
 | `inventory_migration_required` | Does your service have resources (hosts, systems, assets) that need to be migrated or ingested into Kessel inventory before prod enablement — via batch migration, ongoing sync, or both? |
 | `ephemeral.uses_bonfire` | Do you use Ephemeral/Bonfire for pre-dev testing? |

@@ -15,7 +15,7 @@ description: >
 
 ## Configuration
 
-Read `~/.config/kessel-onboarding/config.json`: `jira_cloud_id`, `initiative_project`, `onboarding_project`, `allowed_projects`, `onboarding_label`.
+Read `~/.config/kessel-onboarding/config.json`: `jira_cloud_id`, `initiative_project`, `onboarding_project`, `onboarding_label`.
 
 ## Inputs
 
@@ -30,7 +30,7 @@ Read `~/.config/kessel-onboarding/config.json`: `jira_cloud_id`, `initiative_pro
 
 Substitute `{label}`, `{service_name}`, `{provider_name}`, `{home_project}`, `{feature_epic_key}`.
 
-Use `initiative_project` (CRCPLAN) and `onboarding_project` (RHCLOUD) from config — do not use `allowed_projects` for Initiative or Epic searches.
+Use `initiative_project` and `onboarding_project` from config for Initiative and Epic searches respectively.
 
 ### Existing onboarding epic for this service
 

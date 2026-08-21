@@ -1,26 +1,37 @@
 ---
 name: onboarding-preflight
 description: >
-  Validates config, MCP connectivity, Jira access, REST fallback credentials,
-  and JQL templates before running interview or provision. Run once per
-  machine and after any config change.
+  Gate check before live Jira provisioning. Validates config, MCP connectivity,
+  Jira read access, and JQL templates. When --provisioner is supplied, also
+  validates Jira create-access and REST fallback credentials. Not required for
+  interview, schema-design, or dry-run workflows.
 ---
 
 # Onboarding preflight
 
-Run before the first `/kessel-onboarding:interview` or `/kessel-onboarding:provision` on a machine, and after any change to `~/.config/kessel-onboarding/config.json`. Produces a PASS/FAIL summary so config and access problems surface before a live session, not mid-interview or mid-provision.
+Gate check before live Jira provisioning. Produces a PASS/FAIL summary so config and access problems surface before a provision session, not mid-run.
 
-## When to use
+## When preflight is required
 
-- Before the first `/kessel-onboarding:interview` or `/kessel-onboarding:provision` run on a new machine.
-- After any change to `~/.config/kessel-onboarding/config.json` or the `.env` REST fallback credentials.
-- Whenever an interview or provision session fails with a config, MCP, or Jira access error and you need to isolate the cause.
+**Preflight is only required before live Jira provisioning.** The interview and schema-design skills work without it — they are entirely local and do not call Jira.
+
+| Workflow | Preflight needed? |
+|---|---|
+| Interview only (local artifacts) | No |
+| Schema design | No |
+| Provision `--dry-run` (table only, no writes) | No |
+| Live provision (creates Jira issues) | **Yes — run preflight first** |
+
+Run preflight when:
+- Setting up live provisioning on a new machine for the first time.
+- After changing `~/.config/kessel-onboarding/config.json` or `.env` REST credentials.
+- Troubleshooting a failed provision session.
 
 ## Checks
 
 | # | Check | How | Remediation on fail |
 |---|-------|-----|----------------------|
-| 1 | Config file exists with required keys (`jira_cloud_id`, `initiative_project`, `onboarding_project`, `onboarding_label`, `mcp_server_name`, `team_field_id`, `team_field_value`, `artifacts_dir`) | Read `~/.config/kessel-onboarding/config.json` | Point to `docs/configuration.md` template |
+| 1 | Config file exists with required keys (`jira_cloud_id`, `initiative_project`, `onboarding_project`, `onboarding_label`, `mcp_server_name`, `team_field_id`, `team_field_value`, `artifacts_dir`) — all `YOUR_*` placeholder values must be replaced | Read `~/.config/kessel-onboarding/config.json` | Point to `docs/configuration.md` template |
 | 2 | Atlassian MCP connected and authenticated | Call the accessible-resources tool; confirm `jira_cloud_id` appears | Instructions: authenticate the Atlassian MCP connector; re-run |
 | 3 | Jira read access | Run one JQL search: `project = {onboarding_project} ORDER BY created DESC` max 1 result | Request RHCLOUD read access; link to config doc |
 | 4 | Jira create permission (Provisioner only) | Call `GET /rest/api/3/mypermissions?projectKey={onboarding_project}&permissions=CREATE_ISSUES` via REST fallback. Never create a test issue. | Request create permission in RHCLOUD/CRCPLAN |
@@ -28,11 +39,19 @@ Run before the first `/kessel-onboarding:interview` or `/kessel-onboarding:provi
 | 6 | JQL template lint | Substitute sample values into every JQL template in `skills/onboarding-dedup-epic/SKILL.md` and the first-in-pattern query; run each with max 1 result; any syntax error = FAIL | Report the failing template verbatim |
 | 7 | Artifacts dir writable | Create and delete a temp file in `{artifacts_dir}/profiles/` | Fix path or permissions |
 
+## Inputs
+
+| Input | Required | Notes |
+|---|---|---|
+| `--provisioner` | no | When set, run all 7 checks including create-permission (4) and REST credentials (5). Without this flag, run only checks 1–3, 6–7. |
+
 ## Execution
 
-Run checks 1–7 in order. For each check, produce a row: `#`, check name, PASS/FAIL, remediation (only when FAIL).
+Run checks in order based on the input flag. For each check, produce a row: `#`, check name, PASS/FAIL, remediation (only when FAIL).
 
-Output a summary table. Overall PASS requires checks 1–3 and 6–7 for the Interview Agent, all seven for the Provisioner.
+Output a summary table. Overall PASS:
+- Without `--provisioner`: checks 1–3 and 6–7 must pass
+- With `--provisioner`: all seven checks must pass
 
 ## Notes
 
@@ -44,3 +63,7 @@ Output a summary table. Overall PASS requires checks 1–3 and 6–7 for the Int
 
 - Summary table (console) with overall PASS/FAIL
 - Per-check remediation guidance for any FAIL
+
+## Changelog
+
+- 2026-08: Clarified that preflight is a gate before live Jira provisioning only — interview, schema-design, and `provision --dry-run` workflows are entirely local and do not require it. Added `--provisioner` input flag to select the full 7-check mode (including create-permission and REST credential checks); without the flag only checks 1–3 and 6–7 run. Updated description and scope accordingly.
