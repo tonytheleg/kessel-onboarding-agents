@@ -1,6 +1,6 @@
 ---
 description: Migrate a service's RBAC v1 authorization calls to Kessel/RBAC v2. Finds v1 call sites, classifies each by KSL-016 pattern, fills schema gaps, and writes the actual replacement code for review. Run after schema-design for best results.
-argument-hint: "--rbac <path> --rbac-config <path> [--inventory-api <path>] [--profile <path>] <service-repo>"
+argument-hint: "--rbac <path> [--context <path> | --rbac-config <path>] [--inventory-api <path>] [--profile <path>] [<service-repo>]"
 ---
 
 ## Name

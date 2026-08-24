@@ -591,6 +591,7 @@ When `codebase_ref` is available, look for these to draft Step 2–3 answers:
 
 ## Changelog
 
+- 2026-08: Step 9 extended with Gate 2 — after presenting schema output, offers to invoke migration immediately, write a `migrate-context.md` context file for later, or skip. `migrate-context.md` added to Outputs table. Context file carries v2 permission name mapping, applied patterns, and open questions so `onboarding-migrate-rbac-v1` can skip re-derivation.
 - 2026-07: Steps 0/3a/3d/5/7/8/8.5 — tool preflight (ksl, jq, jsonschema); multi-namespace KSL consolidation; concrete extension-point question (omit when unsure, new services have no dependents); three KSL generation rules (no redundant top-level declarations, no rbac.ksl-owned permissions, top-level for workspace-level only); roles.json must not use _comment (additionalProperties:false); real testing/validation resource links in README; structural validation step after generation.
 - 2026-07: Initial version.
 

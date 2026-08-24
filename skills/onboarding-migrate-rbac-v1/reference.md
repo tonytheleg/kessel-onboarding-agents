@@ -26,7 +26,7 @@ sources, not from memory or from any single service's code:
 | Kessel **Inventory API** — `Check`, `CheckForUpdate`, `StreamedListObjects` | `project-kessel/inventory-api` (`api/kessel/inventory/v1beta2`) |
 | Kessel **Relations API** — `Check`, `CheckForUpdate`, lookup/list | `project-kessel/relations-api` (`api/kessel/relations/v1beta1`) |
 | Language **SDKs / clients** (Go, Java, Python, …) | the `project-kessel` GitHub org (per-language client libraries + generated stubs) |
-| RBAC **v2 workspace lookup** | `insights-rbac` — `GET /api/rbac/v2/workspaces/?type=default|root` |
+| RBAC **v2 workspace lookup** | `insights-rbac` — `GET /api/rbac/v2/workspaces/?type=default` or `?type=root` |
 
 > URLs: `https://github.com/project-kessel/<repo>` for the above repos;
 > RBAC v2 API docs ship with `insights-rbac`. Prefer the **upstream**
@@ -388,3 +388,9 @@ public type myresource {
 After writing the scaffold, re-read it exactly as the "already exist"
 path does — extract the `v2_perm` names from the `.ksl` — and continue
 to Phase 4 using those names.
+
+---
+
+## Changelog
+
+- 2026-08: Initial version — added to kessel-onboarding plugin alongside `onboarding-migrate-rbac-v1/SKILL.md`. Pattern catalog and call shapes are service- and language-agnostic; minimal schema scaffold used only when no schema-design skill is available in the environment.

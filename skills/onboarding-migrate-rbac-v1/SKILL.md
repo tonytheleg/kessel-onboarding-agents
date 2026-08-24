@@ -334,8 +334,8 @@ anything yourself.
 
 - Never modify the `--rbac`, `--rbac-config`, or `--inventory-api`
   repos — all generated schema output goes to `/tmp/migrate-v1-rbac/`.
-- Never commit or push in the service repo — leave changes staged for
-  the user.
+- Never stage, commit, or push in the service repo — leave changes
+  as unstaged working-tree edits so they are visible via `git diff`.
 - If a v1 call site's pattern classification is `low` confidence, do
   not write speculative code for it — flag it in the Phase 5 report
   and ask instead.

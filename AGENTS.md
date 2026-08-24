@@ -53,7 +53,7 @@ commands/
 ├── provision.md          # /kessel-onboarding:provision
 ├── schema-design.md      # /kessel-onboarding:schema-design  (supports --test-mode)
 ├── validate-interview.md # /kessel-onboarding:validate-interview
-└── migrate-rbac.md       # /kessel-onboarding:migrate-rbac-v1
+├── migrate-rbac.md       # /kessel-onboarding:migrate-rbac-v1
 └── test.md               # /kessel-onboarding:test  (full test loop: interview + schema-design + validate)
 ```
 
