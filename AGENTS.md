@@ -26,6 +26,7 @@ The following are **standalone skills** (no full agent required) invoked directl
 | `onboarding-preflight` | `/kessel-onboarding:preflight` | Validates config, MCP, Jira access — run once per machine |
 | `onboarding-schema-design` | `/kessel-onboarding:schema-design` | Generates draft resource schemas (inventory-api) and permissions schemas (rbac-config) from a ServiceProfile + codebase analysis |
 | `onboarding-validate-interview` | `/kessel-onboarding:validate-interview` | Scores an interview's accuracy against a service's actual Kessel implementation; produces a structured gap report |
+| `onboarding-migrate-rbac-v1` | `/kessel-onboarding:migrate-rbac-v1` | Finds v1 RBAC call sites, classifies by KSL-016 pattern, fills schema gaps, writes Kessel v2 replacement code into the service repo (uncommitted) |
 | *(orchestration)* | `/kessel-onboarding:test` | Full test loop — interview + schema-design with Kessel blindfold, then auto-validate. No dedicated skill file; orchestrated by the `test.md` command. |
 
 ## Skill locations
@@ -39,7 +40,8 @@ skills/
 ├── onboarding-format-handoff/       # Packages approved profile as handoff
 ├── onboarding-provision-jira/       # Creates Jira issue batch (dry-run default)
 ├── onboarding-schema-design/        # Generates inventory-api + rbac-config schemas
-└── onboarding-validate-interview/   # Validates interview accuracy vs real implementation
+├── onboarding-validate-interview/   # Validates interview accuracy vs real implementation
+└── onboarding-migrate-rbac-v1/     # Writes v1→v2 RBAC code changes into the service repo
 ```
 
 ## Command locations
@@ -51,6 +53,7 @@ commands/
 ├── provision.md          # /kessel-onboarding:provision
 ├── schema-design.md      # /kessel-onboarding:schema-design  (supports --test-mode)
 ├── validate-interview.md # /kessel-onboarding:validate-interview
+└── migrate-rbac.md       # /kessel-onboarding:migrate-rbac-v1
 └── test.md               # /kessel-onboarding:test  (full test loop: interview + schema-design + validate)
 ```
 

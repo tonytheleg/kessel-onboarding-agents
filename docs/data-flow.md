@@ -1,6 +1,6 @@
 # Data flow
 
-Full skill pipeline. Interview Agent v1 implements the intake branch; schema-design and validate-interview are standalone skills.
+Full skill pipeline. Interview Agent v1 implements the intake branch; schema-design, migrate-rbac-v1, and validate-interview are standalone skills. Provision and schema-design/migrate are independent branches from the interview — provision only needs the handoff to create Jira tracking issues; schema-design and migrate are implementation tools that execute the work those issues track.
 
 ```mermaid
 flowchart TD
@@ -8,23 +8,33 @@ flowchart TD
     interview[Onboarding Interview Agent]
     profile[ServiceProfile JSON]
     handoff[onboarding_profile handoff]
-    context[schema-design context snapshot]
+    schemacontext[schema-design context snapshot]
     schema[schema-design skill]
+    migratecontext[migration context file]
+    migrate[migrate-rbac-v1 skill]
     provisioner[Onboarding Provisioner Agent]
     jira[Jira Initiative + Epic + Stories]
     schemas[Draft schema files\ninventory-api + rbac-config]
+    code[v2 replacement code\nin service repo]
     validate[validate-interview skill]
     report[Validation report]
 
     preflight --> interview
     interview --> profile
     interview --> handoff
-    interview --> context
-    profile --> schema
-    context --> schema
-    schema --> schemas
+    interview --> schemacontext
+
     handoff --> provisioner
     provisioner --> jira
+
+    profile --> schema
+    schemacontext --> schema
+    schema --> schemas
+    schema --> migratecontext
+    migratecontext --> migrate
+    schemas --> migrate
+    migrate --> code
+
     profile --> validate
     validate --> report
 ```
@@ -40,6 +50,8 @@ flowchart TD
 | Draft resource schemas | `onboarding-schema-design` | Team PR to inventory-api | `{artifacts_dir}/schemas/{slug}/inventory-api/` |
 | Draft permissions schemas | `onboarding-schema-design` | Team PR to rbac-config | `{artifacts_dir}/schemas/{slug}/rbac-config/` |
 | Validation report | `onboarding-validate-interview` | Kessel PM / interview skill improvement | `{artifacts_dir}/validation/{slug}-validation-report.md` |
+| Migration context file | `onboarding-schema-design` (Gate 2 "migrate later") | `onboarding-migrate-rbac-v1` (resume) | `{artifacts_dir}/schemas/{slug}/migrate-context.md` |
+| v2 replacement code | `onboarding-migrate-rbac-v1` | Service team PR review | service repo working tree (uncommitted) |
 
 ## Handoff contract: `onboarding_profile`
 
@@ -74,6 +86,7 @@ Required fields for Provisioner (Track B):
 
 ## Changelog
 
+- 2026-08: Added `onboarding-migrate-rbac-v1` to the flow diagram and artifacts table; added migration context file and v2 replacement code artifacts.
 - 2026-07: Added `onboarding-schema-design` and `onboarding-validate-interview` to the flow diagram and artifacts table; added schema-design context snapshot artifact.
 - 2026-07: Bumped handoff schema version reference to 1.2 (accepts 1.0, 1.1, or 1.2).
 - 2026-07: Removed `platform_gates[]` from the Provisioner-required field list — the Provisioner no longer reads it (Jira gate-linking was removed). `platform_gates[]` is still filled on the profile by `onboarding-interview-suggest-patterns` for its own confidence-cap logic.
