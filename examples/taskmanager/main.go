@@ -61,10 +61,12 @@ func (s *taskStore) list() []Task {
 
 // server holds all dependencies for the TaskManager HTTP service.
 type server struct {
-	store      *taskStore
-	kessel     v1beta2.KesselInventoryServiceClient
-	instanceID string
-	baseURL    string
+	store         *taskStore
+	kessel        v1beta2.KesselInventoryServiceClient
+	instanceID    string
+	baseURL       string
+	rbacEndpoint  string // RBAC v2 base URL for workspace lookup (default-workspace pattern)
+	kesselEnabled bool   // when true, enforce Kessel permission checks on all handlers
 }
 
 func main() {
@@ -75,10 +77,12 @@ func main() {
 	defer cleanup()
 
 	svc := &server{
-		store:      &taskStore{tasks: make(map[string]Task)},
-		kessel:     kesselClient,
-		instanceID: envOrDefault("REPORTER_INSTANCE_ID", "taskmanager-1"),
-		baseURL:    envOrDefault("BASE_URL", "http://localhost:8080"),
+		store:         &taskStore{tasks: make(map[string]Task)},
+		kessel:        kesselClient,
+		instanceID:    envOrDefault("REPORTER_INSTANCE_ID", "taskmanager-1"),
+		baseURL:       envOrDefault("BASE_URL", "http://localhost:8080"),
+		rbacEndpoint:  envOrDefault("RBAC_ENDPOINT", ""),
+		kesselEnabled: envOrDefault("KESSEL_ENABLED", "false") == "true",
 	}
 
 	mux := http.NewServeMux()
@@ -100,6 +104,11 @@ func main() {
 // POST /tasks
 // Body: { "title": "...", "status": "open", "workspace_id": "...", "assignee_id": "..." }
 func (s *server) handleCreateTask(w http.ResponseWriter, r *http.Request) {
+	if s.kesselEnabled && !s.checkKesselPermission(r, "taskmanager_task_edit") {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+
 	var req struct {
 		Title       string `json:"title"`
 		Status      string `json:"status"`
@@ -169,6 +178,11 @@ func (s *server) handleCreateTask(w http.ResponseWriter, r *http.Request) {
 //
 // DELETE /tasks/{id}
 func (s *server) handleDeleteTask(w http.ResponseWriter, r *http.Request) {
+	if s.kesselEnabled && !s.checkKesselPermission(r, "taskmanager_task_edit") {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+
 	id := r.PathValue("id")
 	if !s.store.delete(id) {
 		http.Error(w, "task not found", http.StatusNotFound)
@@ -197,6 +211,11 @@ func (s *server) handleDeleteTask(w http.ResponseWriter, r *http.Request) {
 //
 // GET /tasks/{id}
 func (s *server) handleGetTask(w http.ResponseWriter, r *http.Request) {
+	if s.kesselEnabled && !s.checkKesselPermission(r, "taskmanager_task_view") {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+
 	id := r.PathValue("id")
 	task, ok := s.store.get(id)
 	if !ok {
@@ -211,6 +230,11 @@ func (s *server) handleGetTask(w http.ResponseWriter, r *http.Request) {
 //
 // GET /tasks
 func (s *server) handleListTasks(w http.ResponseWriter, r *http.Request) {
+	if s.kesselEnabled && !s.checkKesselPermission(r, "taskmanager_task_view") {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+
 	tasks := s.store.list()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(tasks)
