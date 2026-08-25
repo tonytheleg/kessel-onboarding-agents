@@ -114,21 +114,24 @@ The interview and schema-design skills work without any Jira configuration. To e
 ### Full onboarding pipeline
 
 ```
-preflight → interview → schema-design → provision
-                ↓
-          validate-interview  (run against already-migrated services)
+                    ┌── provision          (creates Jira tracking issues)
+preflight → interview ─┤
+                    └── schema-design → migrate-rbac-v1   (implementation)
+
+validate-interview  (run against already-migrated services, independent)
 ```
 
 ### Skill reference
 
 | Command | What it does | When to use |
 |---------|-------------|-------------|
-| `/kessel-onboarding:preflight` | Validates config, MCP connection, Jira access, and JQL templates | Before first run on a machine and after any config change |
-| `/kessel-onboarding:interview` | Phase 0/1 intake — structured Q&A with EM/tech lead, builds ServiceProfile, suggests adoption patterns, dedups Jira | Start of every new service onboarding |
-| `/kessel-onboarding:schema-design` | Phase 2 head start — analyzes service codebase and generates draft resource schemas (inventory-api) and permissions schemas (rbac-config KSL + JSON) | After the interview, before Phase 2 begins |
-| `/kessel-onboarding:provision` | Dry-run then create Jira issue batch (Initiative + Epic + Phase Stories) from an approved handoff | After the interview, when you're ready to provision Jira issues |
-| `/kessel-onboarding:validate-interview` | Scores an interview's accuracy by comparing its ServiceProfile against the service's actual Kessel implementation | After Phase 4+, or retroactively on already-migrated services, to calibrate and improve the interview skill |
-| `/kessel-onboarding:test` | Full test loop — interview + schema-design with Kessel blindfold on, then auto-validate against real implementation | Against any already-migrated service; primary tool for measuring skill accuracy |
+| [`/kessel-onboarding:preflight`](commands/preflight.md) | Validates config, MCP connection, Jira access, and JQL templates | Before live provisioning on a new machine |
+| [`/kessel-onboarding:interview`](commands/interview.md) | Phase 0/1 intake — structured Q&A with EM/tech lead, builds ServiceProfile, suggests adoption patterns, dedups Jira | Start of every new service onboarding |
+| [`/kessel-onboarding:schema-design`](commands/schema-design.md) | Phase 2 head start — analyzes service codebase and generates draft resource schemas (inventory-api) and permissions schemas (rbac-config KSL + JSON) | After the interview, before Phase 2 begins |
+| [`/kessel-onboarding:provision`](commands/provision.md) | Dry-run then create Jira issue batch (Initiative + Epic + Phase Stories) from an approved handoff | After the interview, when you're ready to provision Jira issues |
+| [`/kessel-onboarding:validate-interview`](commands/validate-interview.md) | Scores an interview's accuracy by comparing its ServiceProfile against the service's actual Kessel implementation | After Phase 4+, or retroactively on already-migrated services |
+| [`/kessel-onboarding:migrate-rbac-v1`](commands/migrate-rbac.md) | Finds v1 RBAC call sites in the service codebase, classifies each by KSL-016 pattern, and writes Kessel v2 replacement code (uncommitted) | After schema-design — translates onboarding decisions into actual code changes |
+| [`/kessel-onboarding:test`](commands/test.md) | Full test loop — interview + schema-design with Kessel blindfold on, then auto-validate against real implementation | Against any already-migrated service; primary tool for measuring skill accuracy |
 
 ### Agents
 
@@ -137,15 +140,16 @@ preflight → interview → schema-design → provision
 | [Onboarding Interview](agents/onboarding-interview.md) | `onboarding-interview-conduct` → `onboarding-interview-suggest-patterns` → `onboarding-dedup-epic` → `onboarding-format-handoff` | `/kessel-onboarding:interview` |
 | [Onboarding Provisioner](agents/onboarding-provisioner.md) | `onboarding-provision-jira` | `/kessel-onboarding:provision` |
 
-The remaining skills (`onboarding-schema-design`, `onboarding-validate-interview`, `onboarding-preflight`) are standalone — they do not require a full agent and can be invoked directly via their slash commands.
+The remaining skills (`onboarding-schema-design`, `onboarding-validate-interview`, `onboarding-migrate-rbac-v1`, `onboarding-preflight`) are standalone — they do not require a full agent and can be invoked directly via their slash commands.
 
 ### When to run each skill
 
 ```
-New service → /kessel-onboarding:preflight      (once per machine)
-           → /kessel-onboarding:interview       (Phase 0/1 intake)
-           → /kessel-onboarding:schema-design   (Phase 2 — before schema modeling begins)
-           → /kessel-onboarding:provision       (when ready to create Jira issues)
+New service → /kessel-onboarding:preflight           (once per machine, only needed for live Jira provisioning)
+           → /kessel-onboarding:interview            (Phase 0/1 intake — produces profile + handoff)
+           ├── /kessel-onboarding:provision          (creates Jira tracking issues from the handoff)
+           └── /kessel-onboarding:schema-design      (Phase 2 — generates KSL + resource schemas)
+                   └── /kessel-onboarding:migrate-rbac-v1  (Phase 4 — writes v1→v2 code changes)
 
 Already-migrated service
            → /kessel-onboarding:validate-interview  (score the interview vs real implementation)

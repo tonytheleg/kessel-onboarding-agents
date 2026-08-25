@@ -516,6 +516,45 @@ Show the EM/tech lead:
 4. **Validation results** — one line per artifact type with its status from Step 8.5; if any check failed, show the error output before anything else
 5. Any flags or warnings (e.g. "write verb was not split — confirm whether delete/move are separate operations")
 
+Then ask: **"Would you like to proceed with migrating the service's v1 RBAC call sites to Kessel v2 code now?"**
+
+- **Migrate now** — invoke `skills/onboarding-migrate-rbac-v1/SKILL.md` with `--profile {profile_path} --rbac-config {rbac_config_path}` and the service codebase. Pass `{output_dir}` so the migrate skill reads v2 permission names directly from the generated KSL.
+- **Migrate later** — write `{output_dir}/migrate-context.md` (see below) and stop.
+- **Skip** — no migration needed (e.g. no existing v1 call sites, or migration will be done manually).
+
+#### Migration context file (when "migrate later" is chosen)
+
+Write `{output_dir}/migrate-context.md`:
+
+```markdown
+# Migration context: {service.name}
+
+**Generated:** {ISO date}
+**ServiceProfile:** {profile_path}
+**Schema artifacts:** {output_dir}
+**Codebase:** {codebase_ref}
+**rbac-config:** {rbac_config_path or "not provided"}
+**inventory-api:** {inventory_api_path or "not provided"}
+
+## Resume command
+
+/kessel-onboarding:migrate-rbac-v1 \
+  --context {output_dir}/migrate-context.md \
+  {codebase_ref}
+
+## v2 permission name mapping
+
+{for each v1 permission → v2_perm from the generated KSL}
+
+## Patterns applied
+
+{for each asset_type: pattern_id, confidence, rationale}
+
+## Open questions
+
+{any medium/low-confidence items or unresolved write-verb splits}
+```
+
 ## Outputs
 
 | Output | Path |
@@ -525,6 +564,7 @@ Show the EM/tech lead:
 | Permissions JSON | `{output_dir}/rbac-config/permissions/{app}.json` (one per v1 app) |
 | Roles JSON | `{output_dir}/rbac-config/roles/{app}.json` (one per v1 app) |
 | README | `{output_dir}/README.md` |
+| Migration context (when "migrate later") | `{output_dir}/migrate-context.md` |
 
 Return all paths to the orchestrating agent or user.
 
@@ -551,6 +591,7 @@ When `codebase_ref` is available, look for these to draft Step 2–3 answers:
 
 ## Changelog
 
+- 2026-08: Step 9 extended with Gate 2 — after presenting schema output, offers to invoke migration immediately, write a `migrate-context.md` context file for later, or skip. `migrate-context.md` added to Outputs table. Context file carries v2 permission name mapping, applied patterns, and open questions so `onboarding-migrate-rbac-v1` can skip re-derivation.
 - 2026-07: Steps 0/3a/3d/5/7/8/8.5 — tool preflight (ksl, jq, jsonschema); multi-namespace KSL consolidation; concrete extension-point question (omit when unsure, new services have no dependents); three KSL generation rules (no redundant top-level declarations, no rbac.ksl-owned permissions, top-level for workspace-level only); roles.json must not use _comment (additionalProperties:false); real testing/validation resource links in README; structural validation step after generation.
 - 2026-07: Initial version.
 
