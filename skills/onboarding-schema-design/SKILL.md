@@ -568,6 +568,8 @@ Write `{output_dir}/migrate-context.md`:
 
 Return all paths to the orchestrating agent or user.
 
+After presenting outputs and Gate 2 options, if the user is not immediately proceeding to migrate or another skill, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics (see `CLAUDE.md` for the selection and presentation pattern).
+
 ## MCP policy
 
 | Tool | Allowed |

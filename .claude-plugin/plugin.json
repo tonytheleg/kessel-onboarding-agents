@@ -1,6 +1,6 @@
 {
   "name": "kessel-onboarding",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "AI-powered Kessel service onboarding including structured intake interview, Jira provisioning, resource and permissions schema design, and interview accuracy validation.",
   "homepage": "https://github.com/project-kessel/kessel-onboarding-agents",
   "repository": "https://github.com/project-kessel/kessel-onboarding-agents",

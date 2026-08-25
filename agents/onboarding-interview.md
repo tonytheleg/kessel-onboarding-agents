@@ -178,6 +178,8 @@ Handoff:  {artifacts_dir}/profiles/{slug}-handoff.md
 Context:  {artifacts_dir}/profiles/{slug}-schema-context.md  (if schema design deferred)
 ```
 
+After reporting paths, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics based on the service profile (see `CLAUDE.md` for the selection and presentation pattern). Skip this if the user is immediately proceeding to schema-design or another skill.
+
 ## Human gates
 
 | Gate | Checkpoint |

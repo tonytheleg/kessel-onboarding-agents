@@ -214,6 +214,8 @@ Note if `reuse_initiative`: mark Initiative row as `REUSE — {existing_key}`.
 
 Return table to orchestrator. Stop here if `dry_run = true`.
 
+After presenting the dry-run table, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics (see `CLAUDE.md` for the selection and presentation pattern). Good candidates at this stage: `service-account`, `sdk-setup`, `env-vars`, `dual-path`.
+
 ### Step 4 — Create issues (when `dry_run = false`)
 
 Create in order. Capture returned key after each create before proceeding.

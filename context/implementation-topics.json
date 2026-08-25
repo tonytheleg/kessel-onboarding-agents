@@ -1,0 +1,156 @@
+{
+  "_description": "Lookup table of Kessel implementation topics. Read by skills to offer contextually relevant follow-up suggestions after completing their primary output. Claude fetches the doc URL on demand — content is never duplicated here.",
+  "_usage": "After a skill completes, read this file, select 3-5 topics relevant to the service's profile (patterns, asset_types, ui_access_checks, inventory_migration_required, tech_stack), and present them as suggested next topics. When a user selects one: (1) if public_url is set, fetch it and answer from the content; (2) if inscope_guide is set, tell the user 'See the [inscope_guide] guide in InScope' — do not fabricate content for internal docs; (3) if plugin_ref is set, read that file from the plugin and answer from it.",
+  "topics": [
+    {
+      "id": "sdk-setup",
+      "title": "SDK Setup and Client Configuration",
+      "tags": ["sdk", "client", "grpc", "clientbuilder", "insecure", "oauth", "oidc", "connection", "go", "java", "python", "ruby", "node"],
+      "description": "Installing and initialising the Kessel SDK for your language — ClientBuilder pattern, auth config, insecure vs TLS",
+      "public_url": "https://project-kessel.github.io/docs/start-here/add-kessel-to-app/"
+    },
+    {
+      "id": "tls-setup",
+      "title": "Enable TLS with Kessel SDKs",
+      "tags": ["tls", "ssl", "certificate", "ca", "secure", "production", "kubernetes", "openshift"],
+      "description": "Configuring TLS transport credentials and OAuth 2.0 together in the Kessel SDKs; mounting CA certs in Kubernetes/OpenShift",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/enable-tls/"
+    },
+    {
+      "id": "python-sdk-auth",
+      "title": "Authenticate with Python SDK",
+      "tags": ["python", "oauth2", "oidc", "token", "refresh", "client-credentials"],
+      "description": "OAuth 2.0 Client Credentials flow with the kessel-sdk-py library, including automatic token refresh",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/authenticate-with-python-sdk/"
+    },
+    {
+      "id": "grpc-ci",
+      "title": "gRPC Compilation in CI",
+      "tags": ["grpc", "ci", "hermetic", "build", "python", "ruby", "binary", "cache", "compilation"],
+      "description": "Fixing gRPC native compilation issues in hermetic CI builds (Python/Ruby); pre-built binaries and build caches",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/setup-sdk-for-ci/"
+    },
+    {
+      "id": "run-locally",
+      "title": "Run Kessel Stack Locally",
+      "tags": ["local", "docker", "podman", "compose", "development", "debug", "stack"],
+      "description": "Spinning up the complete Kessel stack (Inventory API, Relations API, SpiceDB, RBAC, Kafka) locally with Docker/Podman Compose",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/run-with-docker/"
+    },
+    {
+      "id": "rh-authentication",
+      "title": "Red Hat SSO / OIDC Authentication",
+      "tags": ["sso", "oidc", "red-hat", "keycloak", "token", "identity", "issuer", "rh-identity"],
+      "description": "Red Hat-specific SSO endpoints and OIDC configuration for Kessel; testing auth in ephemeral vs stage",
+      "inscope_guide": "Authentication for Red Hat Services"
+    },
+    {
+      "id": "service-account",
+      "title": "Service Account and Credentials Setup",
+      "tags": ["cmdb", "ciam", "service-account", "credentials", "vault", "secret", "application-id", "oauth"],
+      "description": "CMDB registration, CIAM service account provisioning for stage and prod, storing credentials; lead times are weeks — start early",
+      "inscope_guide": "Service Account and Credentials Setup"
+    },
+    {
+      "id": "stage-prod-config",
+      "title": "Using Kessel in Stage and Production",
+      "tags": ["stage", "prod", "production", "clowdapp", "endpoint", "network-policy", "cluster"],
+      "description": "Connecting to Kessel in stage and prod clusters; ClowdApp dependency config, network policy, endpoints",
+      "inscope_guide": "Using Kessel in Stage and Production"
+    },
+    {
+      "id": "ephemeral-testing",
+      "title": "Testing in Ephemeral with Bonfire",
+      "tags": ["ephemeral", "bonfire", "integration-test", "iqe", "namespace", "full-stack"],
+      "description": "Deploying the full Kessel + RBAC + your service stack in an ephemeral namespace for end-to-end integration testing",
+      "inscope_guide": "Deploying the Full Kessel Stack in Ephemeral"
+    },
+    {
+      "id": "check-vs-checkforupdate",
+      "title": "Check vs CheckForUpdate",
+      "tags": ["check", "checkforupdate", "reads", "writes", "authorization", "sensitive"],
+      "description": "When to use Check (read operations) vs CheckForUpdate (writes and sensitive reads)",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/migrate-from-rbac-v1-to-v2/"
+    },
+    {
+      "id": "endpoint-protection",
+      "title": "Protecting a Single Endpoint",
+      "tags": ["middleware", "interceptor", "permission", "endpoint", "gate", "handler", "decorator", "check"],
+      "description": "Adding a Kessel Check call to authorize a specific resource before handling a request",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/protect-endpoint/",
+      "_note": "Public doc is a stub; supplement with patterns from add-kessel-to-app"
+    },
+    {
+      "id": "list-endpoint-authorization",
+      "title": "Protecting List Endpoints",
+      "tags": ["list", "streamlistobjects", "filter", "pagination", "bulk", "checkbulk", "pre-filter"],
+      "description": "Pre-filtering DB queries using workspace IDs from StreamedListObjects; CheckBulk for paginated lists",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/protect-list/",
+      "_note": "Public doc is a stub; full guidance in migrate-from-rbac-v1-to-v2"
+    },
+    {
+      "id": "workspace-lookup",
+      "title": "Workspace ID Resolution",
+      "tags": ["workspace", "default-workspace", "root-workspace", "org-id", "lookup", "rbac-v2", "x-rh-rbac-org-id"],
+      "description": "Resolving DEFAULT or ROOT workspace IDs via RBAC v2 API; use OAuth token + x-rh-rbac-org-id, not x-rh-identity",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/migrate-from-rbac-v1-to-v2/"
+    },
+    {
+      "id": "inventory-reporting",
+      "title": "Reporting Resources to Kessel Inventory",
+      "tags": ["inventory", "reportresource", "deleteresource", "workspace_id", "common-representation", "reporter"],
+      "description": "Calling ReportResource on create and DeleteResource on delete; workspace_id in common representation; write_visibility IMMEDIATE",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/report-resources/"
+    },
+    {
+      "id": "report-resources-async",
+      "title": "Async Resource Reporting (Kafka / CDC)",
+      "tags": ["kafka", "cdc", "outbox", "async", "sync", "debezium", "reliability", "consistency"],
+      "description": "Strategies for reliably replicating resource data into Kessel: direct API vs Kafka messaging vs CDC; trade-offs for durability",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/report-resources/"
+    },
+    {
+      "id": "dual-path",
+      "title": "Dual-Path Feature Flag Rollout",
+      "tags": ["feature-flag", "dual-path", "v1", "v2", "bypass", "fallback", "rollout", "kessel-check-enable"],
+      "description": "Safe rollout using v1/v2 dual-path with feature flags; naming convention {service}.kessel-check.enable",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/migrate-from-rbac-v1-to-v2/"
+    },
+    {
+      "id": "env-vars",
+      "title": "Environment Variables and ClowdApp Config",
+      "tags": ["env", "config", "kessel-url", "kessel-enabled", "clowdapp", "configmap", "kessel-endpoint"],
+      "description": "Required env vars (KESSEL_ENDPOINT, KESSEL_AUTH_CLIENT_ID, etc.) and ClowdApp dependency configuration",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/migrate-from-rbac-v1-to-v2/"
+    },
+    {
+      "id": "rbac-schema-design",
+      "title": "Design Permissions Schema",
+      "tags": ["permissions", "schema", "ksl", "design", "relations", "roles", "rbac"],
+      "description": "Opinionated guidance on designing KSL permissions schemas for common authorization concerns",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/design-permissions/",
+      "_note": "Public doc is a stub; detailed KSL design guidance is in the plugin's schema-design reference"
+    },
+    {
+      "id": "schema-pr",
+      "title": "Submitting Schema PRs",
+      "tags": ["pr", "rbac-config", "inventory-api", "ksl", "schema", "migrated_apps", "review"],
+      "description": "How to submit KSL and resource schema changes to rbac-config and inventory-api; PR review checklist",
+      "plugin_ref": "skills/onboarding-schema-design/reference.md"
+    },
+    {
+      "id": "parity-testing",
+      "title": "Parity Testing and Soak",
+      "tags": ["parity", "soak", "shadow", "dual-write", "stage", "prod", "audit", "v1", "v2"],
+      "description": "Running Kessel in shadow mode alongside v1 RBAC to validate decision parity before cutover",
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/migrate-from-rbac-v1-to-v2/"
+    },
+    {
+      "id": "coderabbit-kessel",
+      "title": "AI-Assisted Code Review for Kessel",
+      "tags": ["coderabbit", "code-review", "pr", "ai", "review", "automation"],
+      "description": "Enabling Kessel-aware CodeRabbit reviews so PRs are automatically checked for correct Kessel integration patterns",
+      "inscope_guide": "AI-Assisted Code Review for Kessel Integrations"
+    }
+  ]
+}

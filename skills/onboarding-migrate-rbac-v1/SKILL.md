@@ -330,6 +330,8 @@ Ask the user (`AskUserQuestion`): review the diff now (`git diff`), or
 hand off to their normal branch/PR workflow. Do not commit or push
 anything yourself.
 
+After the user responds, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics (see `CLAUDE.md` for the selection and presentation pattern). Good candidates at this stage: `parity-testing`, `dual-path`, `testing`, `service-account`.
+
 ## Important Notes
 
 - Never modify the `--rbac`, `--rbac-config`, or `--inventory-api`
