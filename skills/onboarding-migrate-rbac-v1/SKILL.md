@@ -1,6 +1,6 @@
 ---
 name: onboarding-migrate-rbac-v1
-description: "Migrate an HCC service's RBAC v1 authorization calls to Kessel/RBAC v2. Finds v1 call sites, classifies each against the KSL-016 adoption patterns, fills schema gaps, and writes proposed Kessel-based replacement code for review. Use after the onboarding interview and schema-design skills, or standalone via /kessel-onboarding:migrate-rbac-v1."
+description: "Migrate an HCC service's RBAC v1 call sites to Kessel v2. Finds v1 RBAC call sites in the service codebase, classifies each against the KSL-016 adoption patterns, fills schema gaps, and writes Kessel v2 replacement code for review. Use after the onboarding interview and schema-design skills, or standalone via /kessel-onboarding:migrate-rbac-v1."
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:
@@ -14,7 +14,7 @@ allowed-tools:
 argument-hint: "--rbac <path> --rbac-config <path> [--inventory-api <path>] [--profile <path>] <service-repo>"
 ---
 
-# Migrate RBAC v1 Calls to Kessel/RBAC v2
+# Migrate RBAC v1 Call Sites to Kessel v2
 
 This skill turns a v1-only or partially-migrated service into one that
 authorizes via Kessel. It finds every v1 call site, works out the
@@ -64,7 +64,7 @@ Parse `$ARGUMENTS` for:
   `--rbac-config`, `--inventory-api`, the v2 permission name mapping,
   and the pattern classification — skipping all re-derivation. See
   "Bridging from a migration context file" below.
-- One positional argument — the service repo to migrate. May be omitted
+- One positional argument — the service codebase to migrate. May be omitted
   if `--context` already records `codebase_ref`.
 
 If required arguments are missing, prompt with `AskUserQuestion`.
@@ -154,7 +154,7 @@ exist. Record resolved local paths for all repos.
 
 ## Phase 1: Discover v1 Call Sites and Kessel Gate
 
-**1a. Kessel enablement gate.** Search the service repo (excluding
+**1a. Kessel enablement gate.** Search the service codebase (excluding
 tests, vendor, node_modules, `.git`) case-insensitively for:
 
 ```
@@ -170,7 +170,7 @@ Read the matching settings/config files. Record: gate condition
 default value when unset. If nothing matches, the service has zero
 Kessel integration — note that as the starting state, don't fail.
 
-**1b. v1 call sites.** Search for:
+**1b. v1 RBAC call sites.** Search for:
 
 ```
 /api/rbac/v1/access
@@ -334,7 +334,7 @@ anything yourself.
 
 - Never modify the `--rbac`, `--rbac-config`, or `--inventory-api`
   repos — all generated schema output goes to `/tmp/migrate-v1-rbac/`.
-- Never stage, commit, or push in the service repo — leave changes
+- Never stage, commit, or push in the service codebase — leave changes
   as unstaged working-tree edits so they are visible via `git diff`.
 - If a v1 call site's pattern classification is `low` confidence, do
   not write speculative code for it — flag it in the Phase 5 report

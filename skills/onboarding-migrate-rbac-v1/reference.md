@@ -29,7 +29,7 @@ sources, not from memory or from any single service's code:
 | RBAC **v2 workspace lookup** | `insights-rbac` — `GET /api/rbac/v2/workspaces/?type=default` or `?type=root` |
 
 > URLs: `https://github.com/project-kessel/<repo>` for the above repos;
-> RBAC v2 API docs ship with `insights-rbac`. Prefer the **upstream**
+> Kessel v2 API docs ship with `insights-rbac`. Prefer the **upstream**
 > project-kessel / RedHatInsights repos over any local fork.
 
 **Learning from existing implementations.** Several mature console
@@ -213,7 +213,7 @@ handle the unrestricted case explicitly:
 ```
 function allowed_workspaces(subject, org_id):
     # UNRESTRICTED check: can the principal view at the ROOT workspace?
-    root_ws = rbac.workspace(org_id, type="root")        # RBAC v2 lookup
+    root_ws = rbac.workspace(org_id, type="root")        # Kessel v2 lookup
     if kessel.Check(principal(subject), "<v2_perm>",
                     ("workspace", root_ws)).allowed:
         return UNRESTRICTED            # sentinel — apply NO workspace filter
@@ -240,7 +240,7 @@ workspace model live in the org's **default** workspace).
 
 ```
 function may_use_feature(subject, org_id):
-    default_ws = rbac.workspace(org_id, type="default")  # RBAC v2 lookup
+    default_ws = rbac.workspace(org_id, type="default")  # Kessel v2 lookup
     try:
         return kessel.Check(principal(subject), "<v2_perm>",
                             ("workspace", default_ws)).allowed
@@ -248,7 +248,7 @@ function may_use_feature(subject, org_id):
         log; return false                                 # fail closed
 ```
 
-Workspace lookup uses RBAC v2:
+Workspace lookup uses Kessel v2:
 `GET /api/rbac/v2/workspaces/?type=default` (or `type=root`), keyed off
 the identity header. Cache per-org where the service already caches.
 
