@@ -349,6 +349,7 @@ After the user responds, read `context/implementation-topics.json` and offer 3â€
 
 ## Changelog
 
+- 2026-08: Phase 5 now offers 3â€“5 contextually relevant follow-up implementation topics from `context/implementation-topics.json` after the migration report is presented, so users are guided toward next steps (parity testing, dual-path, testing, etc.) without leaving the conversation.
 - 2026-08: Added to kessel-onboarding plugin as `/kessel-onboarding:migrate-rbac-v1`. Added `--context <path>` argument accepting the `migrate-context.md` file written by schema-design Gate 2; context takes precedence over `--profile` and pre-loads v2 permission names and patterns to eliminate re-derivation. Added "Bridging from a migration context file" section.
 
 Assisted-by: Claude (Anthropic)

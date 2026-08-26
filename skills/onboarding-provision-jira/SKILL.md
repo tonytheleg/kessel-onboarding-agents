@@ -312,6 +312,7 @@ Return key map and failure list to orchestrator.
 
 ## Changelog
 
+- 2026-08: Dry-run output step now offers 3–5 contextually relevant follow-up implementation topics from `context/implementation-topics.json` after presenting the issue table, prompting users to consider next steps (service account setup, SDK setup, env vars, etc.).
 - 2026-07: Added the `new` UI story variant (`UI: Implement v2 access checks`, triggered alongside `required` under the same `kessel-phase:ui-migration` label) and per-pattern `asset_types[]` nested bullets in the Epic description for multi-pattern services.
 - 2026-07: Restructured Epic (and Initiative) descriptions into heading + bullet sections for scannability; added credentials, inventory, asset types, v1 permissions, pre-dev tooling, and targets; documented ADF structure rules so provision no longer dumps a single text block.
 - 2026-07: Removed the "Platform gates" section from the Epic description, the Phase 3 "Blocked by" gate text, and the UI story "Blocked by platform readiness" text — these referenced the now-removed `onboarding-link-platform-gates` skill, which never had a populated Jira key to actually link against.
