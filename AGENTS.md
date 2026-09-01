@@ -8,6 +8,7 @@ Agent + skill framework for Kessel service onboarding intake and (future) Jira p
 - **Jira read-only in Interview Agent:** Dedup and feature-epic validation only. Provisioner owns creates/updates (dry-run default).
 - **Artifacts:** Written to `{artifacts_dir}/profiles/` per [docs/configuration.md](docs/configuration.md).
 - **Grounding:** Canonical templates live in `context/`.
+- **Implementation follow-up:** After any main skill completes, read `context/implementation-topics.json` and offer contextually relevant implementation topics. See `CLAUDE.md` for the selection and presentation pattern. This keeps docs as the single source of truth — topic content is fetched from URLs at runtime, never duplicated here.
 - **CI checks:** [`.gitlab-ci.yml`](.gitlab-ci.yml) runs structure/skill-metadata validation and secret/PII scanning on every MR and push to `main` — see [scripts/README.md](scripts/README.md) for what each check does and how to fix a failure locally.
 
 ## Agent index
