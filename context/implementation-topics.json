@@ -21,7 +21,7 @@
       "title": "Authenticate with Python SDK",
       "tags": ["python", "oauth2", "oidc", "token", "refresh", "client-credentials"],
       "description": "OAuth 2.0 Client Credentials flow with the kessel-sdk-py library, including automatic token refresh",
-      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/authenticate-with-python-sdk/"
+      "public_url": "https://project-kessel.github.io/docs/building-with-kessel/how-to/authenticate-with-sdks/"
     },
     {
       "id": "grpc-ci",
