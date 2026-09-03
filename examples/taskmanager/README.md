@@ -185,16 +185,3 @@ curl -s -X DELETE http://localhost:8080/tasks/{id}
 **On delete (`DELETE /tasks/{id}`):**
 1. Task is removed from memory
 2. `DeleteResource` gRPC call removes it from Kessel Inventory
-
----
-
-## Demo flow
-
-```
-1. Run the service (go run .)
-2. /kessel-onboarding:interview  — captures TaskManager's onboarding profile
-3. /kessel-onboarding:schema-design  — generates KSL and inventory-api schemas
-4. Show the generated schemas alongside the ReportResource call in main.go
-5. With Kessel running: create and delete tasks, watch them appear in inventory
-```
-

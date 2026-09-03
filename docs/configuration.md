@@ -38,7 +38,7 @@ Replace all values marked `YOUR_*` with your own. The Kessel team examples are p
 
 ## Finding your cloud ID
 
-Use Atlassian MCP `getAccessibleAtlassianResources` or ask your Jira site admin. Store only in local config.
+Use Atlassian MCP `getAccessibleAtlassianResources`, or if authenticated in browser, you can access https://redhat.atlassian.net/_edge/tenant_info, otherwise ask your Jira site admin. Store only in local config.
 
 ## Finding your team UUID
 
@@ -78,7 +78,7 @@ JIRA_API_TOKEN=your-atlassian-api-token
 
 `JIRA_API_TOKEN` is an Atlassian API token, not a password. Never commit `.env` — confirm it is listed in `.gitignore` (add it if missing). Tokens are personal and scoped to the operator running the Provisioner.
 
-Run `/kessel-onboarding:preflight --provisioner` after completing this configuration.
+Run `/kessel-onboarding:preflight --provisioner` after completing this configuration. For OpenAI, use `@kessel-onboarding onboarding:preflight --provisioner`.
 
 ## Project routing summary
 
@@ -95,6 +95,7 @@ Run `/kessel-onboarding:preflight --provisioner` after completing this configura
 
 ## Changelog
 
+- 2026-09: Added the OpenAI invocation for the post-configuration preflight command.
 - 2026-08: Removed `allowed_projects` (no longer used); updated template to use `YOUR_*` placeholders to make clear users must supply their own project/team values; added Finding your team UUID section.
 - 2026-07: Replaced "Platform gate keys" with "Platform gate status" — clarified that only `status` is used (pattern-suggestion confidence), since the Jira gate-linking skill that consumed `jira_key` was removed.
 - 2026-07: Renamed the Team field reference from "Fabric - Kessel" to "Console - Kessel" (team display name changed; UUID unchanged).

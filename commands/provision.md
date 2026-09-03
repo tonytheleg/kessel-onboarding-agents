@@ -15,6 +15,8 @@ kessel-onboarding:provision
 /kessel-onboarding:provision --handoff artifacts/profiles/activation-keys-handoff.md --confirm
 ```
 
+_For OpenAI, substitute `/kessel-onboarding:provision` with `@kessel-onboarding onboarding:provision` for any commands._
+
 ## Description
 
 Reads an approved `onboarding_profile` handoff and creates a Jira issue batch. Always dry-runs first and waits for EM approval before executing creates.
@@ -57,6 +59,7 @@ Load and execute [agents/onboarding-provisioner.md](../agents/onboarding-provisi
 
 ## Changelog
 
+- 2026-09: Added the OpenAI invocation substitution for command examples.
 - 2026-07: Removed the platform gate linking step — `onboarding-link-platform-gates` was removed (never had a populated Jira key to link against; all gate statuses are now `ready`).
 - 2026-07: Updated the Phase Stories row to note the 6a/6b split.
 

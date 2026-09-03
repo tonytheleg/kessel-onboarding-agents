@@ -22,13 +22,15 @@ AI agents and skills for the Kessel service onboarding program. Jira remains the
    /kessel-onboarding:provision --handoff artifacts/profiles/{slug}-handoff.md --dry-run
    ```
 
+The quick-start examples use Claude Code syntax. For OpenAI substitutions, see [Command examples](#command-examples).
+
 **Only need steps 2–3?** Skip preflight. It is only required before live Jira provisioning (`provision` without `--dry-run`).
 
 ---
 
 ## Installing this plugin
 
-### Via the marketplace (recommended)
+### Claude Code marketplace (recommended for Claude Code)
 
 The plugin is hosted as a Claude Code marketplace on GitHub. Install it permanently in one step:
 
@@ -41,6 +43,20 @@ The plugin is hosted as a Claude Code marketplace on GitHub. Install it permanen
 ```
 
 Once installed, all slash commands are available in every Claude Code session without any flags.
+
+### Codex CLI
+
+Install the plugin from the GitHub marketplace with Codex CLI:
+
+```bash
+codex plugin marketplace add https://github.com/project-kessel/kessel-onboarding-agents
+codex plugin add kessel-onboarding@kessel-onboarding-agents
+```
+
+Start a new Codex session after installing the plugin. Codex's native marketplace format normally uses `.agents/plugins/marketplace.json`, but Codex CLI accepts this repository's existing `.claude-plugin/marketplace.json` as a legacy-compatible marketplace and converts `.claude-plugin/plugin.json` during installation. No second marketplace manifest is required here.
+
+> [!NOTE]
+> The same Github URL can be used for adding the plugin in ChatGPT Desktop UI by navigating to "Plugins" --> "Add" --> "Add a Marketplace"
 
 ### Claude Code (CLI or desktop app) — local or session-only
 
@@ -123,6 +139,16 @@ validate-interview  (run against already-migrated services, independent)
 
 ### Skill reference
 
+### Codex invocation syntax
+
+Codex does not use Claude Code's `/plugin:skill` syntax. For workflows that chain multiple skills, invoke the plugin first and then the namespaced workflow:
+
+```text
+@kessel-onboarding onboarding:interview --provider "UIE" --service "Task Manager" --codebase_ref ~/dev/task-manager
+```
+
+.
+
 | Command | What it does | When to use |
 |---------|-------------|-------------|
 | [`/kessel-onboarding:preflight`](commands/preflight.md) | Validates config, MCP connection, Jira access, and JQL templates | Before live provisioning on a new machine |
@@ -132,6 +158,12 @@ validate-interview  (run against already-migrated services, independent)
 | [`/kessel-onboarding:validate-interview`](commands/validate-interview.md) | Scores an interview's accuracy by comparing its ServiceProfile against the service's actual Kessel implementation | After Phase 4+, or retroactively on already-migrated services |
 | [`/kessel-onboarding:migrate-rbac-v1`](commands/migrate-rbac.md) | Finds v1 RBAC call sites in the service codebase, classifies each by KSL-016 pattern, and writes Kessel v2 replacement code (uncommitted) | After schema-design — translates onboarding decisions into actual code changes |
 | [`/kessel-onboarding:test`](commands/test.md) | Full test loop — interview + schema-design with Kessel blindfold on, then auto-validate against real implementation | Against any already-migrated service; primary tool for measuring skill accuracy |
+
+> [!NOTE]
+> For OpenAI tools, use the plugin-qualified form for chained workflows.
+> Targeting an individual skill directly with `@plugin-name` or `$skill-name` does not reliably preserve the handoff between skill steps.
+> The Codex form maps the Claude Code command `/kessel-onboarding:interview` to `@kessel-onboarding onboarding:interview`, flags can still be provided as expected, OpenAI models will interpret them correctly.
+> See [Command Examples](#command-examples) below for exact commands
 
 ### Agents
 
@@ -164,20 +196,29 @@ Already-migrated service
 
 ### Command examples
 
+The examples below use Claude Code's slash-command syntax. In Codex, use `@kessel-onboarding onboarding:<skill-name>` with the same flags.
+
 #### `/kessel-onboarding:preflight`
 
 ```bash
 # Run before first use on a machine, or after any config change
 /kessel-onboarding:preflight
+# or For OpenAI
+@kessel-onboarding onboarding:preflight
 ```
 
 ---
 
 #### `/kessel-onboarding:interview`
 
+_For OpenAI, substitute `/kessel-onboarding:interview` with `@kessel-onboarding onboarding:interview` for any commands below_
+
 ```bash
 # Simplest — just the service name; Claude will ask for everything else
 /kessel-onboarding:interview "Activation Keys"
+
+# For OpenAI
+@kessel-onboarding onboarding:interview
 
 # With provider context (avoids being asked for it during the session)
 /kessel-onboarding:interview --provider "Subscription Management" --service "Activation Keys"
@@ -203,6 +244,8 @@ Already-migrated service
 
 #### `/kessel-onboarding:schema-design`
 
+_For OpenAI, substitute `/kessel-onboarding:schema-design` with `@kessel-onboarding onboarding:schema-design` for any commands below_
+
 ```bash
 # Simplest — profile only; Claude will ask for codebase reference before continuing
 /kessel-onboarding:schema-design \
@@ -211,24 +254,26 @@ Already-migrated service
 # With codebase reference (avoids being prompted)
 /kessel-onboarding:schema-design \
   --profile artifacts/profiles/activation-keys-profile.json \
-  --codebase_ref ~/dev/activation-keys
+  --codebase_ref path/to/codebase
 
 # Custom output directory
 /kessel-onboarding:schema-design \
   --profile artifacts/profiles/activation-keys-profile.json \
-  --codebase_ref ~/dev/activation-keys \
+  --codebase_ref path/to/codebase \
   --output_dir ~/scratch/activation-keys-schemas
 
 # Test mode — ignores existing KSL and inventory-api schemas; outputs to artifacts/test/{slug}/schemas/
 /kessel-onboarding:schema-design \
   --profile artifacts/test/host-based-inventory/profiles/host-based-inventory-profile.json \
-  --codebase_ref ~/dev/insights-host-inventory \
+  --codebase_ref path/to/codebase \
   --test-mode
 ```
 
 ---
 
 #### `/kessel-onboarding:provision`
+
+_For OpenAI, substitute `/kessel-onboarding:provision` with `@kessel-onboarding onboarding:provision` for any commands below_
 
 ```bash
 # Simplest — always dry-runs first and waits for approval before creating anything
@@ -250,57 +295,96 @@ Already-migrated service
 
 #### `/kessel-onboarding:validate-interview`
 
+_For OpenAI, substitute `/kessel-onboarding:validate-interview` with `@kessel-onboarding onboarding:validate-interview` for any commands below_
+
 ```bash
 # Simplest — codebase only; skips KSL and resource schema dimensions
 /kessel-onboarding:validate-interview \
   --profile artifacts/profiles/host-based-inventory-profile.json \
-  --codebase_ref ~/dev/insights-host-inventory
+  --codebase_ref path/to/codebase
 
 # With rbac-config — adds KSL, permissions.json, and roles.json scoring
 /kessel-onboarding:validate-interview \
   --profile artifacts/profiles/host-based-inventory-profile.json \
-  --codebase_ref ~/dev/insights-host-inventory \
+  --codebase_ref path/to/codebase \
   --rbac_config_path ~/dev/rbac-config
 
 # Full — all repos; scores all 12 interview dimensions
 /kessel-onboarding:validate-interview \
   --profile artifacts/profiles/host-based-inventory-profile.json \
-  --codebase_ref ~/dev/insights-host-inventory \
+  --codebase_ref path/to/codebase \
   --rbac_config_path ~/dev/rbac-config \
-  --inventory_api_path ~/go/src/github.com/tonytheleg/inventory-api
+  --inventory_api_path path/to/cloned-inventory-api-repo
 
 # Full + schema artifacts — adds 4 schema-design dimensions (dimensions 13–16)
 /kessel-onboarding:validate-interview \
   --profile artifacts/profiles/host-based-inventory-profile.json \
-  --codebase_ref ~/dev/insights-host-inventory \
+  --codebase_ref path/to/codebase \
   --rbac_config_path ~/dev/rbac-config \
-  --inventory_api_path ~/go/src/github.com/tonytheleg/inventory-api \
+  --inventory_api_path path/to/cloned-inventory-api-repo \
   --schema_artifacts_path artifacts/schemas/host-based-inventory
+```
+
+---
+
+#### `/kessel-onboarding:migrate-rbac-v1`
+
+_For OpenAI, substitute `/kessel-onboarding:migrate-rbac-v1` with `@kessel-onboarding onboarding:migrate-rbac-v1` for any commands below_
+
+```bash
+# Best path — after schema-design deferred migration (context has v2 names + patterns pre-loaded)
+/kessel-onboarding:migrate-rbac-v1 \
+  --rbac /path/to/insights-rbac \
+  --context artifacts/schemas/task-manager/migrate-context.md \
+  ~/dev/my-service
+
+# After an interview only — use the profile to skip pattern re-derivation
+/kessel-onboarding:migrate-rbac-v1 \
+  --rbac /path/to/insights-rbac \
+  --rbac-config /path/to/rbac-config \
+  --profile artifacts/profiles/task-manager-profile.json \
+  ~/dev/my-service
+
+# Standalone — no prior onboarding, discovers everything from the repo
+/kessel-onboarding:migrate-rbac-v1 \
+  --rbac /path/to/insights-rbac \
+  --rbac-config /path/to/rbac-config \
+  ~/dev/my-service
+
+# With inventory-api (needed for native / native-ws-list resource schemas)
+/kessel-onboarding:migrate-rbac-v1 \
+  --rbac /path/to/insights-rbac \
+  --rbac-config /path/to/rbac-config \
+  --inventory-api /path/to/inventory-api \
+  --context artifacts/schemas/task-manager/migrate-context.md \
+  ~/dev/my-service
 ```
 
 ---
 
 #### `/kessel-onboarding:test`
 
+_For OpenAI, substitute `/kessel-onboarding:test` with `@kessel-onboarding onboarding:test` for any commands below_
+
 ```bash
 # Simplest — interview + schema-design (blindfolded) + validate; Claude finds rbac-config/inventory-api automatically
 /kessel-onboarding:test \
   --service "Host Based Inventory" \
-  --codebase_ref ~/dev/insights-host-inventory
+  --codebase_ref path/to/codebase
 
 # With provider context
 /kessel-onboarding:test \
   --service "Host Based Inventory" \
   --provider "Insights" \
-  --codebase_ref ~/dev/insights-host-inventory
+  --codebase_ref path/to/codebase
 
 # Full — explicit repo paths for complete 16-dimension scoring
 /kessel-onboarding:test \
   --service "Host Based Inventory" \
   --provider "Insights" \
-  --codebase_ref ~/dev/insights-host-inventory \
+  --codebase_ref path/to/codebase \
   --rbac_config_path ~/dev/rbac-config \
-  --inventory_api_path ~/go/src/github.com/tonytheleg/inventory-api
+  --inventory_api_path path/to/cloned-inventory-api-repo
 ```
 
 ---
@@ -323,6 +407,7 @@ Support: [#forum-mgmt-fabric](https://redhat.enterprise.slack.com/archives/C064X
 
 ## Changelog
 
+- 2026-09: Added OpenAI/Codex installation and invocation guidance throughout the README, including `migrate-rbac-v1` command examples.
 - 2026-07: Added `test` command and `--test-mode` flag to interview and schema-design; added command examples section covering simple to fully-flagged invocations for all skills.
 - 2026-07: Added `schema-design` and `validate-interview` skills; updated quick start, skill reference table, and loading instructions for Claude Code and Cursor.
 - 2026-07: Reworded the platform-gates quick-start step — gate status now only affects pattern-suggestion confidence, since Jira gate-linking was removed (the linking skill never had a populated Jira key to link against).

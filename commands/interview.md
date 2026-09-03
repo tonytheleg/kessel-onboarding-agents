@@ -17,6 +17,8 @@ kessel-onboarding:interview
 /kessel-onboarding:interview --service "Activation Keys" --save-only
 ```
 
+_For OpenAI, substitute `/kessel-onboarding:interview` with `@kessel-onboarding onboarding:interview` for any commands._
+
 ## Description
 
 Structured intake with the service EM and tech lead. Builds a ServiceProfile, suggests adoption patterns, dedups existing Jira onboarding work, and packages an EM-approved handoff for the Provisioner Agent.

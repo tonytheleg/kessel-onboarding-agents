@@ -14,6 +14,8 @@ kessel-onboarding:test
 /kessel-onboarding:test --service "Activation Keys" --provider "Subscription Management" --codebase_ref ~/dev/activation-keys --rbac_config_path ~/dev/rbac-config --inventory_api_path ~/go/src/github.com/tonytheleg/inventory-api
 ```
 
+_For OpenAI, substitute `/kessel-onboarding:test` with `@kessel-onboarding onboarding:test` for any commands._
+
 ## Description
 
 Runs the onboarding interview and schema-design skills against a service that has already been onboarded to Kessel, with a **Kessel blindfold** active — existing SDK code, permission classes, KSL files, and inventory-api resource schemas are ignored during analysis. The skills derive their answers from the pre-Kessel signals in the codebase (v1 RBAC patterns, domain models, tech stack), exactly as they would for a net-new service.
@@ -104,6 +106,7 @@ The Kessel blindfold applied during interview and schema-design:
 
 ## Changelog
 
+- 2026-09: Added the OpenAI invocation substitution for command examples.
 - 2026-07: Initial version.
 
 Assisted-by: Claude (Anthropic)

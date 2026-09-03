@@ -38,6 +38,8 @@ kessel-onboarding:migrate-rbac-v1
   ~/dev/my-service
 ```
 
+_For OpenAI, substitute `/kessel-onboarding:migrate-rbac-v1` with `@kessel-onboarding onboarding:migrate-rbac-v1` for any commands._
+
 ## Description
 
 Bridges the gap between "onboarding decided what to do" and "here is the actual code change." Runs five phases:
@@ -79,6 +81,7 @@ Run after `/kessel-onboarding:schema-design` to translate the onboarding decisio
 
 ## Changelog
 
+- 2026-09: Added OpenAI invocation guidance to the command examples.
 - 2026-08: Initial version — added to kessel-onboarding plugin as the code-migration step following schema-design.
 
 Assisted-by: Claude (Anthropic)

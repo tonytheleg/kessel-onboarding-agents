@@ -14,6 +14,8 @@ kessel-onboarding:preflight
 /kessel-onboarding:preflight --provisioner
 ```
 
+_For OpenAI, substitute `/kessel-onboarding:preflight` with `@kessel-onboarding onboarding:preflight` for any commands._
+
 ## Description
 
 Validates config, MCP connection, Jira access, REST fallback, and JQL templates. Run once per machine and after any config change.
