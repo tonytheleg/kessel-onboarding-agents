@@ -215,7 +215,7 @@ _For OpenAI, substitute `/kessel-onboarding:interview` with `@kessel-onboarding 
 
 ```bash
 # Simplest — just the service name; Claude will ask for everything else
-/kessel-onboarding:interview "Activation Keys" or
+/kessel-onboarding:interview "Activation Keys"
 
 # For OpenAI
 @kessel-onboarding onboarding:interview
@@ -384,7 +384,7 @@ _For OpenAI, substitute `/kessel-onboarding:test` with `@kessel-onboarding onboa
   --provider "Insights" \
   --codebase_ref path/to/codebase \
   --rbac_config_path ~/dev/rbac-config \
-  --inventory_api_path ~/go/src/github.com/tonytheleg/inventory-api
+  --inventory_api_path path/to/cloned-inventory-api-repo
 ```
 
 ---
