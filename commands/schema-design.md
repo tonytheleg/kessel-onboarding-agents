@@ -15,6 +15,8 @@ kessel-onboarding:schema-design
 /kessel-onboarding:schema-design --profile artifacts/profiles/host-based-inventory-profile.json --output_dir ./schemas-draft
 ```
 
+_For OpenAI, substitute `/kessel-onboarding:schema-design` with `@kessel-onboarding onboarding:schema-design` for any commands._
+
 ## Description
 
 Reads a completed ServiceProfile and generates the schema files a service needs for Kessel integration. Conducts a short follow-up Q&A for reporter naming, v2 permission names, and reporter-specific fields, then writes all output as local files.
@@ -61,6 +63,7 @@ Paths to all generated files under the output directory:
 
 ## Changelog
 
+- 2026-09: Added the OpenAI invocation substitution for command examples.
 - 2026-07: Initial version.
 
 Assisted-by: Claude (Anthropic)

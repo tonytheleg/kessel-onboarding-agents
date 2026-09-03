@@ -14,6 +14,8 @@ kessel-onboarding:validate-interview
 /kessel-onboarding:validate-interview --profile artifacts/profiles/hbi-profile.json --codebase_ref ~/dev/insights-host-inventory --rbac_config_path ~/dev/rbac-config --inventory_api_path ~/go/src/github.com/tonytheleg/inventory-api
 ```
 
+_For OpenAI, substitute `/kessel-onboarding:validate-interview` with `@kessel-onboarding onboarding:validate-interview` for any commands._
+
 ## Description
 
 Compares a completed onboarding interview ServiceProfile against the service's actual Kessel implementation across 12 dimensions:
@@ -90,6 +92,7 @@ Running before Phase 4 may produce incomplete results as the Kessel integration 
 
 ## Changelog
 
+- 2026-09: Added the OpenAI invocation substitution for command examples.
 - 2026-07: Initial version. Codifies the manual HBI interview validation process.
 
 Assisted-by: Claude (Anthropic)

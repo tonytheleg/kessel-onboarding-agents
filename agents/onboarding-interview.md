@@ -149,6 +149,8 @@ Write `{artifacts_dir}/profiles/{slug}-schema-context.md` containing everything 
 
 /kessel-onboarding:schema-design --profile {path to profile JSON} [--codebase_ref PATH]
 
+_For OpenAI, substitute `/kessel-onboarding:schema-design` with `@kessel-onboarding onboarding:schema-design` when resuming this workflow._
+
 ## Interview findings relevant to schema design
 
 ### Asset types and patterns
