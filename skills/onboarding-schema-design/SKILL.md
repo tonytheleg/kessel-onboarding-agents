@@ -568,7 +568,7 @@ Write `{output_dir}/migrate-context.md`:
 
 Return all paths to the orchestrating agent or user.
 
-After presenting outputs and Gate 2 options, if the user is not immediately proceeding to migrate or another skill, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics (see `CLAUDE.md` for the selection and presentation pattern).
+After presenting outputs and Gate 2 options, if the user is not immediately proceeding to migrate or another skill, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics (see `AGENTS.md` for the selection and presentation pattern).
 
 ## MCP policy
 
@@ -593,6 +593,7 @@ When `codebase_ref` is available, look for these to draft Step 2–3 answers:
 
 ## Changelog
 
+- 2026-09: Updated the follow-up implementation topic guidance to use the shared workflow in `AGENTS.md`.
 - 2026-08: Step 9 now offers 3–5 contextually relevant follow-up implementation topics from `context/implementation-topics.json` when the user is not immediately proceeding to migration, so users are guided toward implementation next steps without leaving the conversation.
 - 2026-08: Step 9 extended with Gate 2 — after presenting schema output, offers to invoke migration immediately, write a `migrate-context.md` context file for later, or skip. `migrate-context.md` added to Outputs table. Context file carries v2 permission name mapping, applied patterns, and open questions so `onboarding-migrate-rbac-v1` can skip re-derivation.
 - 2026-07: Steps 0/3a/3d/5/7/8/8.5 — tool preflight (ksl, jq, jsonschema); multi-namespace KSL consolidation; concrete extension-point question (omit when unsure, new services have no dependents); three KSL generation rules (no redundant top-level declarations, no rbac.ksl-owned permissions, top-level for workspace-level only); roles.json must not use _comment (additionalProperties:false); real testing/validation resource links in README; structural validation step after generation.

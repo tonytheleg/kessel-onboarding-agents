@@ -214,7 +214,7 @@ Note if `reuse_initiative`: mark Initiative row as `REUSE — {existing_key}`.
 
 Return table to orchestrator. Stop here if `dry_run = true`.
 
-After presenting the dry-run table, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics (see `CLAUDE.md` for the selection and presentation pattern). Good candidates at this stage: `service-account`, `sdk-setup`, `env-vars`, `dual-path`.
+After presenting the dry-run table, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics (see `AGENTS.md` for the selection and presentation pattern). Good candidates at this stage: `service-account`, `sdk-setup`, `env-vars`, `dual-path`.
 
 ### Step 4 — Create issues (when `dry_run = false`)
 
@@ -312,6 +312,7 @@ Return key map and failure list to orchestrator.
 
 ## Changelog
 
+- 2026-09: Updated the follow-up implementation topic guidance to use the shared workflow in `AGENTS.md`.
 - 2026-08: Dry-run output step now offers 3–5 contextually relevant follow-up implementation topics from `context/implementation-topics.json` after presenting the issue table, prompting users to consider next steps (service account setup, SDK setup, env vars, etc.).
 - 2026-07: Added the `new` UI story variant (`UI: Implement v2 access checks`, triggered alongside `required` under the same `kessel-phase:ui-migration` label) and per-pattern `asset_types[]` nested bullets in the Epic description for multi-pattern services.
 - 2026-07: Restructured Epic (and Initiative) descriptions into heading + bullet sections for scannability; added credentials, inventory, asset types, v1 permissions, pre-dev tooling, and targets; documented ADF structure rules so provision no longer dumps a single text block.
