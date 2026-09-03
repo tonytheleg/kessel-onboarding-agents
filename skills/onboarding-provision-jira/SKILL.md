@@ -212,9 +212,9 @@ DRY RUN — no issues created
 
 Note if `reuse_initiative`: mark Initiative row as `REUSE — {existing_key}`.
 
-Return table to orchestrator. Stop here if `dry_run = true`.
-
 After presenting the dry-run table, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics (see `AGENTS.md` for the selection and presentation pattern). Good candidates at this stage: `service-account`, `sdk-setup`, `env-vars`, `dual-path`.
+
+Return table to orchestrator. Stop here if `dry_run = true`.
 
 ### Step 4 — Create issues (when `dry_run = false`)
 
