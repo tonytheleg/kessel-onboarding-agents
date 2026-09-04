@@ -180,7 +180,7 @@ Handoff:  {artifacts_dir}/profiles/{slug}-handoff.md
 Context:  {artifacts_dir}/profiles/{slug}-schema-context.md  (if schema design deferred)
 ```
 
-After reporting paths, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics based on the service profile (see `CLAUDE.md` for the selection and presentation pattern). Skip this if the user is immediately proceeding to schema-design or another skill.
+After reporting paths, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics based on the service profile (see `AGENTS.md` for the selection and presentation pattern). Skip this if the user is immediately proceeding to schema-design or another skill.
 
 ## Human gates
 
@@ -215,6 +215,7 @@ See wave2 pilot.
 
 ## Changelog
 
+- 2026-09: Updated the follow-up implementation topic guidance to use the shared workflow in `AGENTS.md`.
 - 2026-08: Added `test_mode` to inputs table, Step 1 flag parsing, and Step 2 pass-through; documented test-mode Gate 2 behaviour (skip interactive prompt, return profile path to orchestrating command).
 - 2026-07: Added "Design schemas" option to Gate 2 — invokes `onboarding-schema-design` skill to generate draft resource and permissions schemas as a Phase 2 head start.
 - 2026-07: Added optional `codebase_ref` input, passed through to `onboarding-interview-conduct` so it can draft tech-stack/UI-access/permissions answers from repo analysis for the EM/tech lead to confirm (see that skill's Step 1.5).

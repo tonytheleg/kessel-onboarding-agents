@@ -187,7 +187,7 @@ Summary format: see [reference.md](reference.md#narrative-summary-template).
 
 ### Step 5 — Present draft
 
-Show EM a concise summary table of captured fields. List any gaps flagged for Phase 1 follow-up. Do **not** run suggest-patterns or dedup here — the agent orchestrator calls those next.
+Before requesting EM approval, render the **full profile summary table** in the conversation/chat. Include every captured ServiceProfile field, including unknown or `TBD` values, codebase-derived rationales, and any gaps flagged for Phase 1 follow-up. Writing the narrative summary file or returning its path is not a substitute for displaying the table. Do **not** run suggest-patterns or dedup here — the agent orchestrator calls those next.
 
 ## Headless mode
 
@@ -209,6 +209,7 @@ Return both paths to the orchestrating agent.
 
 ## Changelog
 
+- 2026-09: Gate 1 now requires the complete ServiceProfile summary table to be rendered in the conversation before EM approval, rather than only writing or reporting the artifact path.
 - 2026-08: Added `test_mode` to inputs table; updated Step 4 to document conditional artifact routing (`{artifacts_dir}/profiles/` vs `{artifacts_dir}/test/{slug}/profiles/` when `test_mode = true`).
 - 2026-08: Elevated Group 5 asset-type ownership question to a mandatory rule (must be asked for every asset type, not skipped); catches types like `group` that map to `rbac.workspace` rather than requiring a new `public type`. Expanded blindfold keep-list to cover all RBAC service integration code (v1 AND v2) with disambiguation rule: RBAC service REST calls (kept) vs Kessel SDK calls (ignored).
 - 2026-08: Added Kessel blindfold rules to Step 1.5 for `--test-mode` — ignores existing Kessel SDK, permission classes, and client code; derives answers from pre-Kessel signals only; annotates drafted values with `(test mode)` marker for the validation skill.

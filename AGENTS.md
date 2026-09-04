@@ -8,8 +8,36 @@ Agent + skill framework for Kessel service onboarding intake and (future) Jira p
 - **Jira read-only in Interview Agent:** Dedup and feature-epic validation only. Provisioner owns creates/updates (dry-run default).
 - **Artifacts:** Written to `{artifacts_dir}/profiles/` per [docs/configuration.md](docs/configuration.md).
 - **Grounding:** Canonical templates live in `context/`.
-- **Implementation follow-up:** After any main skill completes, read `context/implementation-topics.json` and offer contextually relevant implementation topics. See `CLAUDE.md` for the selection and presentation pattern. This keeps docs as the single source of truth — topic content is fetched from URLs at runtime, never duplicated here.
+- **Implementation follow-up:** After any main skill completes, read `context/implementation-topics.json` and offer contextually relevant implementation topics. Follow the [Follow-up implementation topics](#follow-up-implementation-topics) workflow below. This keeps docs as the single source of truth — topic content is fetched from URLs at runtime, never duplicated here.
 - **CI checks:** [`.gitlab-ci.yml`](.gitlab-ci.yml) runs structure/skill-metadata validation and secret/PII scanning on every MR and push to `main` — see [scripts/README.md](scripts/README.md) for what each check does and how to fix a failure locally.
+
+## Follow-up implementation topics
+
+After any main skill completes its primary output (interview → profile approved, schema-design → schemas generated, provision → dry-run shown, migrate-rbac-v1 → report written), if the user is not immediately moving to another skill:
+
+1. Read `context/implementation-topics.json`.
+2. Select 3–5 topics whose `tags` match the service's context:
+   - `inventory_migration_required = true` → suggest `inventory-reporting`, `schema-pr`
+   - `ui_access_checks = required` → suggest `endpoint-protection`
+   - Pattern = `native-ws-list` → suggest `list-endpoint-authorization`
+   - Pattern = `default-workspace` or `root-workspace` → suggest `workspace-lookup`
+   - Credentials not set up → always suggest `service-account`
+   - Any service → always include `sdk-setup`, `check-vs-checkforupdate`
+3. Present suggestions conversationally — not as a menu, just a short list:
+   > "A few things worth looking at next:
+   > - **SDK Setup** — configuring the Kessel client for Go
+   > - **Check vs CheckForUpdate** — which to use for reads vs writes
+   > - **Inventory Reporting** — calling ReportResource and DeleteResource correctly
+   > Want to dig into any of these, or something else?"
+4. When the user picks a topic or asks a related question, resolve it based on which field is set:
+   - `public_url` — fetch with the available web-fetch tool and answer from the document content. Do not reproduce the full document; answer the specific question with citations.
+   - `inscope_guide` — tell the user: "See the '[inscope_guide value]' guide in InScope." Do not fabricate content for internal docs.
+   - `plugin_ref` — read that file from within the plugin directory and answer from it.
+5. Keep the interview profile, schema artifacts, and migration context in scope throughout — tailor answers to the specific service (language, patterns, asset types) rather than giving generic guidance.
+
+This is free-form conversation guided by the topic index, not a structured skill. Do not force users through a fixed flow — answer what they ask, suggest what's relevant, and follow their lead.
+
+`context/implementation-topics.json` is the current topic list and URL source. Never hardcode topic URLs in skill files; keep topic content in the index and fetch it at runtime.
 
 ## Agent index
 
@@ -88,6 +116,7 @@ Tool names vary by MCP server implementation; skills refer to capabilities, not 
 
 ## Changelog
 
+- 2026-09: Moved the follow-up implementation topic selection and presentation workflow from `CLAUDE.md` into this shared instruction file so all supported runtimes can apply it.
 - 2026-07: Added GitLab CI (`.gitlab-ci.yml`, `scripts/`, `.gitleaks.toml`, `.pre-commit-config.yaml`) — structure/skill-metadata validation and secret/PII scanning, adapted from the TAILWIND program repo's CI and trimmed to this repo's single-contributor, no-registry/no-sandbox/no-license layout. Added a `## When to use` section to every `skills/*/SKILL.md` to satisfy the new metadata check.
 - 2026-07: Added `onboarding-schema-design` and `onboarding-validate-interview` to skill index, locations tree, and commands table.
 - 2026-07: Removed `onboarding-link-platform-gates` from the Provisioner's skill list and the skill locations tree — the skill was removed (it never had a populated Jira key to link against; all gate statuses are now `ready`). Platform gate status is still read during pattern suggestion (confidence cap / wave restriction); only the Jira-linking half was removed.
