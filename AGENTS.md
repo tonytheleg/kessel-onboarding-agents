@@ -33,7 +33,7 @@ After any main skill completes its primary output (interview → profile approve
    followed by bullets, and do not present the topics as numbered choices or
    a menu. The response must include:
    - a natural-language lead-in;
-   - 3–5 tailored topic bullets; and
+   - 2–5 tailored topic bullets; and
    - a natural-language closing question inviting the user to choose a topic
      or ask for something else.
    Before sending, verify all three parts are present. A topics response

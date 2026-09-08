@@ -86,6 +86,10 @@ Run after `/kessel-onboarding:schema-design` to translate the onboarding decisio
 
 ## Changelog
 
+- 2026-09: Production authorization is now classified by default, including
+  incomplete marker or permission mappings, so stub wording cannot suppress
+  required migration work.
+
 - 2026-09: Added OpenAI invocation guidance to the command examples.
 - 2026-08: Initial version — added to kessel-onboarding plugin as the code-migration step following schema-design.
 
