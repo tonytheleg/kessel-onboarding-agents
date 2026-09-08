@@ -265,6 +265,25 @@ mapping directly from the `.ksl` file's `add_v1_based_permission` (or
 exact names in Phase 4 — never invent new ones when a mapping already
 exists.
 
+Before generating or delegating any Phase 3 schema output, or writing any
+Phase 4 replacement code, request explicit user approval through the
+available user-approval question capability. Summarize the planned files,
+call sites, permission mapping, and unresolved questions. Offer exactly
+these choices:
+
+- **Proceed** — continue to the planned writes.
+- **Revise** — return to Phase 2/3 planning, update the proposed approach,
+  and ask for approval again before writing.
+- **Abort** — stop the migration without performing any writes.
+
+Do not invoke a schema-design capability, generate a Phase 3 scaffold, or
+perform a Phase 4 file-writing operation until the user selects **Proceed**.
+If the plan or write targets change materially, request approval again before
+writing. A **Revise** response returns to planning; an **Abort** response
+ends the migration and is reported as stopped. This approval requirement
+covers writes to generated artifacts, the service codebase, and the migration
+report; no destructive or external write may bypass it.
+
 **If missing for a namespace:**
 
 1. Check whether a schema-design capability is available in this
@@ -294,19 +313,6 @@ Once a mapping exists (from either path), re-read it the same way as
 the "already exist" case above and continue to Phase 4.
 
 ## Phase 4: Write the Replacement Code
-
-Before any Phase 4 file-writing Edit operation, call AskUserQuestion with an
-approval gate that summarizes the planned files, call sites, permission
-mapping, and any unresolved questions. Offer exactly these choices:
-
-- **Proceed** — continue to the planned writes.
-- **Revise** — return to Phase 2/3 planning, update the proposed approach,
-  and ask for approval again before writing.
-- **Abort** — stop the migration without performing Phase 4 writes.
-
-Do not perform any Phase 4 Edit or Write operation until the user selects
-Proceed. A Revise response returns to planning; an Abort response ends the
-migration and is reported as stopped.
 
 For each migration target and partial migration from Phase 1c:
 
@@ -366,7 +372,15 @@ Ask the user (`AskUserQuestion`): review the diff now (`git diff`), or
 hand off to their normal branch/PR workflow. Do not commit or push
 anything yourself.
 
-After the user responds, read `context/implementation-topics.json` and offer 2–5 relevant follow-up implementation topics (see `AGENTS.md` for the selection and presentation pattern). Good candidates at this stage: `parity-testing`, `dual-path`, `testing`, `service-account`.
+After the user responds, follow the user's intent directly. Continue a
+requested diff review, normal branch/PR handoff, or another skill; answer an
+unrelated question directly; and do not offer implementation topics in those
+paths. Otherwise, read `context/implementation-topics.json` and offer 2–5
+relevant follow-up implementation topics using the selection and presentation
+pattern in `AGENTS.md`: include a natural-language lead-in, tailor the topics
+to the service context, and end with a question inviting the user to choose a
+topic or ask for something else. Good candidates at this stage:
+`parity-testing`, `dual-path`, `testing`, `service-account`.
 
 ## Important Notes
 
