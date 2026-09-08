@@ -54,6 +54,11 @@ Nothing is committed or pushed. All changes land in the working tree for review 
 
 **With `--profile`:** cross-checks Phase 1 findings against the ServiceProfile's `v1_permissions`, and uses its `patterns[]` directly in Phase 2 instead of re-running the decision tree. This eliminates redundant Q&A when the interview has already been run.
 
+All services are treated as production by default. A source comment containing
+`KESSEL_ONBOARDING_PRODUCTION_AUTHZ: true` explicitly marks declared RBAC
+constants, routes, or helpers as a production authorization surface; nearby
+demo or stub wording must not suppress migration work.
+
 ## Implementation
 
 Load and execute [skills/onboarding-migrate-rbac-v1/SKILL.md](../skills/onboarding-migrate-rbac-v1/SKILL.md).

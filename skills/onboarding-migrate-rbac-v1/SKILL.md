@@ -170,6 +170,11 @@ Read the matching settings/config files. Record: gate condition
 default value when unset. If nothing matches, the service has zero
 Kessel integration — note that as the starting state, don't fail.
 
+Before the v1 scan, also search for the source marker
+KESSEL_ONBOARDING_PRODUCTION_AUTHZ: true. Record its file and line. This
+marker means that nearby RBAC declarations and helpers are an intentional
+production authorization surface, even if the implementation is incomplete.
+
 **1b. v1 RBAC call sites.** Search for:
 
 ```
@@ -208,6 +213,24 @@ chain: is it behind the Phase 1a gate condition?
   from scratch — this is where real bugs hide (see reference.md's
   gotchas — e.g. a hardcoded "no, you don't have unrestricted access"
   fallback that never gets set `true`).
+
+### 1d. Declared-but-unimplemented authorization
+
+Every service is treated as production by default. Comments describing code as
+a demo or stub are not sufficient evidence to conclude that no change is
+needed. If the scan finds v1 permission constants, an RBAC route, a permission
+helper, or an approved profile mapping but no executable request or check, do
+not treat that finding as equivalent to "the service has no authorization
+work." Record it as an incomplete authorization contract, inspect the
+resource handlers, and implement v2 checks there when the endpoint mapping is
+clear, preserving fail-closed behavior and the approved permission mapping.
+
+Services may make this intent explicit with the source marker
+KESSEL_ONBOARDING_PRODUCTION_AUTHZ: true. When present, the marker overrides
+demo-only or stub wording in nearby comments: the declared authorization
+surface must be migrated or the ambiguity must be surfaced. Never produce a
+no-op migration report solely because a marked helper currently returns a
+placeholder result.
 
 ## Phase 2: Classify Each Permission
 
