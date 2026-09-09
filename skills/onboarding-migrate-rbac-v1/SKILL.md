@@ -170,6 +170,11 @@ Read the matching settings/config files. Record: gate condition
 default value when unset. If nothing matches, the service has zero
 Kessel integration — note that as the starting state, don't fail.
 
+Before the v1 scan, also search for the source marker
+KESSEL_ONBOARDING_PRODUCTION_AUTHZ: true. Record its file and line. This
+marker means that nearby RBAC declarations and helpers are an intentional
+production authorization surface, even if the implementation is incomplete.
+
 **1b. v1 RBAC call sites.** Search for:
 
 ```
@@ -209,6 +214,24 @@ chain: is it behind the Phase 1a gate condition?
   gotchas — e.g. a hardcoded "no, you don't have unrestricted access"
   fallback that never gets set `true`).
 
+### 1d. Declared-but-unimplemented authorization
+
+Every service is treated as production by default. Comments describing code as
+a demo or stub are not sufficient evidence to conclude that no change is
+needed. If the scan finds v1 permission constants, an RBAC route, a permission
+helper, or an approved profile mapping but no executable request or check, do
+not treat that finding as equivalent to "the service has no authorization
+work." Record it as an incomplete authorization contract, inspect the
+resource handlers, and implement v2 checks there when the endpoint mapping is
+clear, preserving fail-closed behavior and the approved permission mapping.
+
+Services may make this intent explicit with the source marker
+KESSEL_ONBOARDING_PRODUCTION_AUTHZ: true. When present, the marker overrides
+demo-only or stub wording in nearby comments: the declared authorization
+surface must be migrated or the ambiguity must be surfaced. Never produce a
+no-op migration report solely because a marked helper currently returns a
+placeholder result.
+
 ## Phase 2: Classify Each Permission
 
 For each distinct v1 permission found in Phase 1b
@@ -241,6 +264,25 @@ mapping directly from the `.ksl` file's `add_v1_based_permission` (or
 `add_unified_permission` / `add_v1only_permission`) calls. Use these
 exact names in Phase 4 — never invent new ones when a mapping already
 exists.
+
+Before generating or delegating any Phase 3 schema output, or writing any
+Phase 4 replacement code, request explicit user approval through the
+available user-approval question capability. Summarize the planned files,
+call sites, permission mapping, and unresolved questions. Offer exactly
+these choices:
+
+- **Proceed** — continue to the planned writes.
+- **Revise** — return to Phase 2/3 planning, update the proposed approach,
+  and ask for approval again before writing.
+- **Abort** — stop the migration without performing any writes.
+
+Do not invoke a schema-design capability, generate a Phase 3 scaffold, or
+perform a Phase 4 file-writing operation until the user selects **Proceed**.
+If the plan or write targets change materially, request approval again before
+writing. A **Revise** response returns to planning; an **Abort** response
+ends the migration and is reported as stopped. This approval requirement
+covers writes to generated artifacts, the service codebase, and the migration
+report; no destructive or external write may bypass it.
 
 **If missing for a namespace:**
 
@@ -330,7 +372,15 @@ Ask the user (`AskUserQuestion`): review the diff now (`git diff`), or
 hand off to their normal branch/PR workflow. Do not commit or push
 anything yourself.
 
-After the user responds, read `context/implementation-topics.json` and offer 3–5 relevant follow-up implementation topics (see `AGENTS.md` for the selection and presentation pattern). Good candidates at this stage: `parity-testing`, `dual-path`, `testing`, `service-account`.
+After the user responds, follow the user's intent directly. Continue a
+requested diff review, normal branch/PR handoff, or another skill; answer an
+unrelated question directly; and do not offer implementation topics in those
+paths. Otherwise, read `context/implementation-topics.json` and offer 2–5
+relevant follow-up implementation topics using the selection and presentation
+pattern in `AGENTS.md`: include a natural-language lead-in, tailor the topics
+to the service context, and end with a question inviting the user to choose a
+topic or ask for something else. Good candidates at this stage:
+`parity-testing`, `dual-path`, `testing`, `service-account`.
 
 ## Important Notes
 
@@ -348,6 +398,11 @@ After the user responds, read `context/implementation-topics.json` and offer 3�
   — always fall back to reference.md's scaffold.
 
 ## Changelog
+
+- 2026-09: Treat services as production by default during authorization
+  classification; require migration or surfaced ambiguity when markers or
+  mappings exist without executable checks, and honor
+  KESSEL_ONBOARDING_PRODUCTION_AUTHZ: true.
 
 - 2026-09: Updated the follow-up implementation topic guidance to use the shared workflow in `AGENTS.md`.
 - 2026-08: Phase 5 now offers 3–5 contextually relevant follow-up implementation topics from `context/implementation-topics.json` after the migration report is presented, so users are guided toward next steps (parity testing, dual-path, testing, etc.) without leaving the conversation.

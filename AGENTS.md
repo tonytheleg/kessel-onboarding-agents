@@ -29,6 +29,16 @@ After any main skill completes its primary output (interview → profile approve
    > - **Check vs CheckForUpdate** — which to use for reads vs writes
    > - **Inventory Reporting** — calling ReportResource and DeleteResource correctly
    > Want to dig into any of these, or something else?"
+   The conversational wrapper is mandatory. Do not output only a heading
+   followed by bullets, and do not present the topics as numbered choices or
+   a menu. The response must include:
+   - a natural-language lead-in;
+   - 2–5 tailored topic bullets; and
+   - a natural-language closing question inviting the user to choose a topic
+     or ask for something else.
+   Before sending, verify all three parts are present. A topics response
+   without the lead-in or closing question is non-compliant, even if the
+   topic selection itself is correct.
 4. When the user picks a topic or asks a related question, resolve it based on which field is set:
    - `public_url` — fetch with the available web-fetch tool and answer from the document content. Do not reproduce the full document; answer the specific question with citations.
    - `inscope_guide` — tell the user: "See the '[inscope_guide value]' guide in InScope." Do not fabricate content for internal docs.

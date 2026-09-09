@@ -54,6 +54,11 @@ Nothing is committed or pushed. All changes land in the working tree for review 
 
 **With `--profile`:** cross-checks Phase 1 findings against the ServiceProfile's `v1_permissions`, and uses its `patterns[]` directly in Phase 2 instead of re-running the decision tree. This eliminates redundant Q&A when the interview has already been run.
 
+All services are treated as production by default. A source comment containing
+`KESSEL_ONBOARDING_PRODUCTION_AUTHZ: true` explicitly marks declared RBAC
+constants, routes, or helpers as a production authorization surface; nearby
+demo or stub wording must not suppress migration work.
+
 ## Implementation
 
 Load and execute [skills/onboarding-migrate-rbac-v1/SKILL.md](../skills/onboarding-migrate-rbac-v1/SKILL.md).
@@ -80,6 +85,10 @@ Load and execute [skills/onboarding-migrate-rbac-v1/SKILL.md](../skills/onboardi
 Run after `/kessel-onboarding:schema-design` to translate the onboarding decisions into actual service code. Can also run standalone without a prior interview if only code migration is needed.
 
 ## Changelog
+
+- 2026-09: Production authorization is now classified by default, including
+  incomplete marker or permission mappings, so stub wording cannot suppress
+  required migration work.
 
 - 2026-09: Added OpenAI invocation guidance to the command examples.
 - 2026-08: Initial version — added to kessel-onboarding plugin as the code-migration step following schema-design.
